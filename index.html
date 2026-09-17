@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中心服务邮局 - 企业级安全域名邮局与通信解决方案</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="site_config.js"></script>
+</head>
+<body>
+
+  <!-- 模块一：全局导航栏 Aero 毛玻璃 -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        中心服务邮局
+        <span class="badge">email.example.com</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="active">首页</a>
+        <a href="features.html">核心特性</a>
+        <a href="pricing.html">解决方案</a>
+        <a href="webmail.html">Webmail客户端</a>
+        <a href="admin.html">管理控制台</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="webmail.html" class="btn-login">登录邮箱</a>
+        <a href="contact.html" class="btn-cta">注册域名邮箱</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 模块二：Hero两列蓝图区域（首页首屏） -->
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-content animate-fade-in">
+        <div class="hero-tag">
+          <span class="dot"></span> <span data-config="hero_tag">企业级自建域名邮局</span>
+        </div>
+        <h1 class="hero-title" data-config="hero_title">中心服务邮局</h1>
+        <p class="hero-subtitle" data-config="hero_subtitle">
+          私有化部署的安全堡垒，企业级通信的管理中枢。支持深度定制与四级权限管理的专业邮件解决方案。
+        </p>
+        <div class="hero-btns">
+          <a href="contact.html" class="btn-cta" style="padding: 12px 26px; font-size: 15px;" data-config="btn_register_text">注册域名邮箱</a>
+          <a href="admin.html" class="btn-outline" style="padding: 12px 26px; font-size: 15px;" data-config="btn_admin_text">进入管理台</a>
+        </div>
+      </div>
+      
+      <div class="hero-panel aero-glass animate-fade-in" style="animation-delay: 0.15s;">
+        <div class="hero-metrics">
+          <div class="metric-item">
+            <div class="metric-num">Mailcow</div>
+            <div class="metric-desc">底层强力驱动引擎</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-num">无缝集成</div>
+            <div class="metric-desc">支持主流邮箱后缀</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-num">100%</div>
+            <div class="metric-desc">核心数据完全私有化</div>
+          </div>
+        </div>
+        
+        <div class="flow-diagram">
+          <div class="flow-step">
+            <div class="step-icon">01</div>
+            <div class="step-text">验证身份</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="step-icon">02</div>
+            <div class="step-text">选择域名</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="step-icon">03</div>
+            <div class="step-text">分配权限</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="step-icon">04</div>
+            <div class="step-text">开始收发</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模块三：四级权限管理架构（首页第二屏） -->
+  <section class="permission-section">
+    <div class="container">
+      <h2 class="section-title">精细化的四级权限体系</h2>
+      <p class="section-subtitle">从系统底层到独立用户的全链路管控，确保企业信息安全与管理效率。</p>
+      
+      <div class="table-wrapper aero-glass">
+        <table class="permission-table">
+          <thead>
+            <tr>
+              <th>行为权限项 / 角色维度</th>
+              <th>超级管理员</th>
+              <th>管理员</th>
+              <th>域名管理员</th>
+              <th>下属管理员</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>底层 Mailcow 联动与域名创建</td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-gray">○</span></td>
+              <td><span class="check-gray">-</span></td>
+              <td><span class="check-gray">-</span></td>
+            </tr>
+            <tr>
+              <td>全部界面主题与UI定制</td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-gray">○</span></td>
+              <td><span class="check-gray">-</span></td>
+              <td><span class="check-gray">-</span></td>
+            </tr>
+            <tr>
+              <td>单/多域名下全部邮箱管理</td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-gray">○</span></td>
+              <td><span class="check-gray">-</span></td>
+            </tr>
+            <tr>
+              <td>部分指定邮箱的管理权限</td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-gray">○</span></td>
+            </tr>
+            <tr>
+              <td>创建/删除普通域名邮箱</td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-gray">-</span></td>
+            </tr>
+            <tr>
+              <td>分配收发信状态及配额限制</td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+              <td><span class="check-orange">✓</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="text-align: center; margin-top: 28px;">
+        <a href="features.html" class="btn-outline">查看完整权限说明与技术细节 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模块四：企业级核心功能特性（首页第三屏） -->
+  <section class="features-section">
+    <div class="container">
+      <h2 class="section-title">为企业通信打造的核心能力</h2>
+      <p class="section-subtitle">融合极致安全防护与高效管理架构，满足现代大中型企业严苛标准。</p>
+      
+      <div class="feature-cards-grid">
+        <div class="feature-card aero-glass stagger-item">
+          <div class="feature-card-header">
+            <div class="feature-icon">🛡️</div>
+            <h3>严格的注册验证机制</h3>
+          </div>
+          <p>方案：已有主流邮箱（谷歌/微软/QQ等）验证 + HTML邮件验证码双重保障，支持邀请码自定义后缀，杜绝恶意注册。</p>
+        </div>
+
+        <div class="feature-card aero-glass stagger-item">
+          <div class="feature-card-header">
+            <div class="feature-icon">📮</div>
+            <h3>专业级 Webmail 体验</h3>
+          </div>
+          <p>方案：内置类 Roundcube 客户端，包含收件箱、发件箱、草稿箱、垃圾箱、已删除邮件等完整模块，极速响应。</p>
+        </div>
+
+        <div class="feature-card aero-glass stagger-item">
+          <div class="feature-card-header">
+            <div class="feature-icon">🗑️</div>
+            <h3>两阶段安全删除机制</h3>
+          </div>
+          <p>方案：右键删除分为「移至已删除邮件（软删除）」与「服务器彻底物理删除（硬删除）」，多重防误删保障。</p>
+        </div>
+
+        <div class="feature-card aero-glass stagger-item">
+          <div class="feature-card-header">
+            <div class="feature-icon">⚙️</div>
+            <h3>细粒度收发策略控制</h3>
+          </div>
+          <p>方案：管理员可对名下单个邮箱设置「发信、收信、仅收信」状态，并可严格限制每日/周/月的发信额度。</p>
+        </div>
+
+        <div class="feature-card aero-glass stagger-item" style="grid-column: span 2;">
+          <div class="feature-card-header">
+            <div class="feature-icon">🎨</div>
+            <h3>全局HTML邮件与UI定制</h3>
+          </div>
+          <p>方案：原生支持 HTML 格式邮件发送与解析；超级管理员可全局更改界面主题与所有可编辑内容，适配企业品牌视觉。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模块五：客户端与界面预览（首页第四屏） -->
+  <section class="preview-section">
+    <div class="container preview-grid">
+      <div class="preview-text">
+        <h2 class="section-title" style="text-align: left; margin-bottom: 20px;">极简高效的交互体验</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 24px; line-height: 1.7;">
+          内置现代化 Webmail 客户端与功能完备的管理后台，直观的操作逻辑与严密的权限控制完美融合。无论是日常收发信件还是对账号配额、安全策略的集中调度，皆可游刃有余。
+        </p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; color: var(--text-primary); font-size: 15px;">
+          <li>✓ 支持标准 IMAP / SMTP / POP3 协议接入</li>
+          <li>✓ 传输层全链路 TLS 1.3 加密，坚不可摧</li>
+          <li>✓ 毫秒级邮件检索与多级目录管理</li>
+        </ul>
+        <a href="webmail.html" class="btn-cta">立即体验 Webmail 客户端</a>
+      </div>
+      
+      <div class="preview-ui-mockup aero-glass" style="padding:0; overflow:hidden;">
+        <div class="mockup-header">
+          <div class="mockup-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="mockup-title">email.example.com - Webmail Client & Console</div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-sidebar">
+            <div class="mockup-line active" style="width: 80%;"></div>
+            <div class="mockup-line" style="width: 65%;"></div>
+            <div class="mockup-line" style="width: 75%;"></div>
+            <div class="mockup-line" style="width: 50%;"></div>
+          </div>
+          <div class="mockup-content-area">
+            <div class="mockup-row" style="width: 100%;"></div>
+            <div class="mockup-row" style="width: 90%;"></div>
+            <div class="mockup-row" style="width: 95%;"></div>
+            <div class="mockup-row" style="width: 60%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模块六：注册/申请表单（首页第五屏） -->
+  <section class="form-section">
+    <div class="container">
+      <h2 class="section-title">申请入驻中心服务邮局</h2>
+      <p class="section-subtitle">填写下方信息，开启您的企业级安全域名通信之旅。</p>
+      
+      <div class="form-grid-wrapper">
+        <div class="form-card-left aero-glass" style="padding: 40px;">
+          <form action="contact.html" method="GET">
+            <div class="form-group">
+              <label>现有主流邮箱地址（用于身份验证）</label>
+              <input type="email" placeholder="name@company.com" required>
+            </div>
+            <div class="form-group verify-group">
+              <div style="flex: 1;">
+                <label>HTML 邮件验证码</label>
+                <input type="text" placeholder="请输入 6 位验证码" required>
+              </div>
+              <button type="button" class="btn-outline" style="margin-top: 24px; white-space: nowrap;">获取验证码</button>
+            </div>
+            <div class="form-group">
+              <label>选择域名后缀（由超级管理员预设）</label>
+              <select required>
+                <option value="example.com">@example.com (中心服务邮局官方域)</option>
+                <option value="learnflow.edu.kg">@learnflow.edu.kg (教育专用域)</option>
+                <option value="secure-mail.net">@secure-mail.net (高防商务域)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>期望的前缀（账号名）</label>
+              <input type="text" placeholder="例如：admin 或 security" required>
+            </div>
+            <div class="form-group">
+              <label>可选邀请码（用于自定义域名专属通道）</label>
+              <input type="text" placeholder="如有邀请码请在此输入">
+            </div>
+            <button type="submit" class="btn-cta" style="width: 100%; padding: 12px; margin-top: 8px; font-size: 16px;">提交注册申请</button>
+          </form>
+        </div>
+        
+        <div class="form-receipt-card aero-glass" style="padding: 36px;">
+          <div class="receipt-header">系统回执预览</div>
+          <div class="receipt-body">
+            <p style="font-weight: 600; color: var(--accent-orange); margin-bottom: 12px;">🔒 安全审核机制说明：</p>
+            <p style="margin-bottom: 12px;">1. 系统将向您的备用主流邮箱发送一封包含 HTML 验证码的安全确认邮件。</p>
+            <p style="margin-bottom: 12px;">2. 验证通过后，将自动进入超级管理员或域名管理员审核队列。</p>
+            <p>3. 审核成功后，您将获得专属的 <code>email.example.com</code> 域名邮局访问权限及初始化密钥。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 模块七：页脚 -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>中心服务邮局</h4>
+        <p>私有化部署的安全堡垒，企业级通信的管理中枢。为中大型企业提供最高标准的独立域名邮箱与加密通信解决方案。</p>
+        <div class="seo-tags">
+          <span>自建邮局</span>
+          <span>企业邮箱</span>
+          <span>Mailcow</span>
+          <span>Roundcube</span>
+          <span>私有化部署</span>
+          <span>邮件安全隔离</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>客户端与控制台</h4>
+        <ul>
+          <li><a href="webmail.html">Webmail 客户端登录</a></li>
+          <li><a href="admin.html">邮局管理控制台</a></li>
+          <li><a href="features.html">四级权限管理说明</a></li>
+          <li><a href="pricing.html">方案定价与对比</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>帮助与文档</h4>
+        <ul>
+          <li><a href="features.html">SMTP/IMAP 配置指南</a></li>
+          <li><a href="contact.html">获取邀请码</a></li>
+          <li><a href="contact.html">技术支持工单</a></li>
+          <li><a href="index.html">安全白皮书</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>协议与隐私</h4>
+        <ul>
+          <li><a href="index.html">服务条款 (ToS)</a></li>
+          <li><a href="index.html">数据隐私政策</a></li>
+          <li><a href="index.html">合规审计说明</a></li>
+          <li><a href="contact.html">联系合规专员</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-row">
+        <div>© 2026 中心服务邮局 email.example.com 保留所有权利。</div>
+        <div>Enterprise Secure Mail & Communication Infrastructure</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+<script src="particles.js"></script>
+</html>

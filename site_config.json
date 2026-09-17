@@ -1,0 +1,47 @@
+{
+    "brand": {
+        "site_name": "中心服务邮局",
+        "badge": "email.example.com",
+        "primary_color": "#ec652b"
+    },
+    "nav_menu": [
+        {
+            "id": "nav_home",
+            "name": "首页",
+            "url": "index.html",
+            "visible": true
+        },
+        {
+            "id": "nav_features",
+            "name": "核心特性",
+            "url": "features.html",
+            "visible": true
+        },
+        {
+            "id": "nav_pricing",
+            "name": "解决方案",
+            "url": "pricing.html",
+            "visible": true
+        },
+        {
+            "id": "nav_webmail",
+            "name": "Webmail客户端",
+            "url": "webmail.html",
+            "visible": true
+        },
+        {
+            "id": "nav_admin",
+            "name": "管理控制台",
+            "url": "admin.html",
+            "visible": true
+        }
+    ],
+    "page_content": {
+        "hero_tag": "企业级自建域名邮局",
+        "hero_title": "中心服务邮局",
+        "hero_subtitle": "私有化部署的安全堡垒，企业级通信的管理中枢。支持深度定制与四级权限管理的专业邮件解决方案。",
+        "btn_register_text": "注册域名邮箱",
+        "btn_admin_text": "进入管理台",
+        "btn_login_text": "登录邮箱"
+    }
+}

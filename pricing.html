@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>解决方案与方案定价 - 中心服务邮局</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="site_config.js"></script>
+</head>
+<body>
+
+  <!-- 模块一：全局导航栏 -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        中心服务邮局
+        <span class="badge">email.example.com</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="features.html">核心特性</a>
+        <a href="pricing.html" class="active">解决方案</a>
+        <a href="webmail.html">Webmail客户端</a>
+        <a href="admin.html">管理控制台</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="webmail.html" class="btn-login">登录邮箱</a>
+        <a href="contact.html" class="btn-cta">注册域名邮箱</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 页面主体内容 -->
+  <main class="container" style="padding: 60px 24px;">
+    <div style="text-align: center; max-width: 800px; margin: 0 auto 56px;">
+      <h1 style="font-size: 40px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px;">企业私有化部署解决方案与定价</h1>
+      <p style="font-size: 16px; color: var(--text-secondary);">面向中大型企业、技术团队与合规要求严苛的组织，提供 100% 数据私有化、独立域名与高性能加密通信方案。</p>
+    </div>
+
+    <!-- 定价卡片网格 -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; margin-bottom: 60px;">
+      
+      <!-- 方案一：团队标准版 -->
+      <div style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+        <div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Starter Edition</div>
+          <h3 style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">团队标准私有邮局</h3>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">适合成长型技术团队与中小企业，快速搭建独立域名通信系统。</p>
+          <div style="font-size: 36px; font-weight: 700; color: var(--text-primary); margin-bottom: 24px;">¥ 2,980 <span style="font-size: 14px; font-weight: 400; color: var(--text-secondary);">/ 年</span></div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; font-size: 14px; color: var(--text-primary);">
+            <li>✓ 支持 1 个独立主域名 (如 @email.example.com)</li>
+            <li>✓ 最多支持 50 个企业邮箱账号</li>
+            <li>✓ 包含完整 Webmail 客户端与基础管理后台</li>
+            <li>✓ 标准 Mailcow 底层容器与 TLS 加密</li>
+            <li>✓ 邮件定期自动备份与恢复支持</li>
+          </ul>
+        </div>
+        <a href="contact.html" class="btn-outline" style="text-align: center; display: block; padding: 12px;">申请团队版部署</a>
+      </div>
+
+      <!-- 方案二：企业专业版 (推荐) -->
+      <div style="background: var(--bg-panel); border: 2px solid var(--accent-orange); border-radius: var(--radius); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-md); position: relative;">
+        <div style="position: absolute; top: -14px; right: 24px; background: var(--accent-orange); color: #ffffff; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 12px;">最受欢迎</div>
+        <div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--accent-orange); text-transform: uppercase; margin-bottom: 8px;">Professional Enterprise</div>
+          <h3 style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">企业安全旗舰版</h3>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">适合中大型企业，提供四级权限体系、细粒度发信控制与高级反垃圾网关。</p>
+          <div style="font-size: 36px; font-weight: 700; color: var(--text-primary); margin-bottom: 24px;">¥ 6,800 <span style="font-size: 14px; font-weight: 400; color: var(--text-secondary);">/ 年</span></div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; font-size: 14px; color: var(--text-primary);">
+            <li>✓ 支持多域名管理（主域 + 子域名）</li>
+            <li>✓ 不限账号数（按服务器性能横向扩展）</li>
+            <li>✓ 完整四级权限体系（超管、管理、域名管、下属管）</li>
+            <li>✓ 两阶段安全删除机制与细粒度收发策略</li>
+            <li>✓ 全局 HTML 邮件与企业品牌 UI 深度定制</li>
+            <li>✓ 7×24 小时技术专家响应与安全审计</li>
+          </ul>
+        </div>
+        <a href="contact.html" class="btn-cta" style="text-align: center; display: block; padding: 12px;">立即申请企业入驻</a>
+      </div>
+
+      <!-- 方案三：私有化定制版 -->
+      <div style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+        <div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Custom Dedicated</div>
+          <h3 style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">私有化独立集群版</h3>
+          <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">专为集团级客户或涉密单位打造，支持完全独立物理机房部署与国密算法对接。</p>
+          <div style="font-size: 36px; font-weight: 700; color: var(--text-primary); margin-bottom: 24px;">定制报价 <span style="font-size: 14px; font-weight: 400; color: var(--text-secondary);">/ 按需</span></div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; font-size: 14px; color: var(--text-primary);">
+            <li>✓ 独立物理服务器或专有云集群部署</li>
+            <li>✓ 100% 物理隔离与数据主权归客户所有</li>
+            <li>✓ 支持国密加密算法及定制安全合规接口</li>
+            <li>✓ 专属架构师一对一迁移与实施服务</li>
+            <li>✓ SLA 99.99% 高可用保障</li>
+          </ul>
+        </div>
+        <a href="contact.html" class="btn-outline" style="text-align: center; display: block; padding: 12px;">联系架构师定制</a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 模块七：页脚 -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>中心服务邮局</h4>
+        <p>私有化部署的安全堡垒，企业级通信的管理中枢。</p>
+        <div class="seo-tags">
+          <span>自建邮局</span>
+          <span>企业邮箱</span>
+          <span>Mailcow</span>
+          <span>Roundcube</span>
+          <span>私有化部署</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>客户端与控制台</h4>
+        <ul>
+          <li><a href="webmail.html">Webmail 客户端登录</a></li>
+          <li><a href="admin.html">邮局管理控制台</a></li>
+          <li><a href="pricing.html">方案定价与对比</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>帮助与文档</h4>
+        <ul>
+          <li><a href="features.html">SMTP/IMAP 配置指南</a></li>
+          <li><a href="contact.html">获取邀请码</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>协议与隐私</h4>
+        <ul>
+          <li><a href="index.html">服务条款 (ToS)</a></li>
+          <li><a href="index.html">数据隐私政策</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-row">
+        <div>© 2026 中心服务邮局 email.example.com 保留所有权利。</div>
+        <div>Enterprise Secure Mail Solutions</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+<script src="particles.js"></script>
+</html>

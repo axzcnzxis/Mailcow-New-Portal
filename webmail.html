@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中心服务邮局 - Webmail 客户端</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="site_config.js"></script>
+  <style>
+    /* 客户端内嵌独立布局 (支持方案1+方案2全屏与响应式自适应) */
+    html, body {
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .webmail-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: calc(100dvh - 64px);
+      overflow: hidden;
+    }
+    
+    /* 登录视图 */
+    .login-view {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+    .login-card {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-shadow);
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+      transition: all 0.3s var(--cubic-bezier);
+    }
+    .login-card:hover {
+      box-shadow: var(--glass-shadow-hover);
+      border-color: var(--glass-border-glow);
+    }
+    .login-logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .login-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* 客户端工作区视图 (登录后显示) */
+    .app-view {
+      display: none; /* 登录后改为 flex */
+      flex: 1;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+    
+    .app-sidebar {
+      width: 230px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 12px;
+      box-sizing: border-box;
+    }
+
+    .compose-btn-wrapper {
+      margin-bottom: 16px;
+    }
+    .btn-compose {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent-orange);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-compose:hover {
+      background: var(--accent-orange-hover);
+    }
+
+    .folder-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .folder-item {
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .folder-item:hover, .folder-item.active {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .folder-item .badge-count {
+      font-size: 11px;
+      background: var(--border-color);
+      color: var(--text-primary);
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    .user-profile-bar {
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    /* 邮件中间列表 */
+    .app-mail-list {
+      width: 320px;
+      height: 100%;
+      background: var(--bg-canvas);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .mail-list-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-panel);
+    }
+    .mail-card-item {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .mail-card-item:hover, .mail-card-item.active {
+      background: #ffffff;
+    }
+    .mail-card-item .sender {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .mail-card-item .date {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+    .mail-card-item .subject {
+      font-size: 13px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mail-card-item .preview {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 邮件右侧阅读面板 */
+    .app-mail-reader {
+      flex: 1;
+      height: 100%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    /* 方案 2：响应式断点媒体查询 (@media) */
+    @media screen and (max-width: 1024px) {
+      .app-sidebar {
+        width: 72px;
+        padding: 12px 6px;
+      }
+      .btn-compose span:not(:first-child) {
+        display: none;
+      }
+      .btn-compose {
+        padding: 10px 0;
+      }
+      .folder-item {
+        justify-content: center;
+        padding: 10px 0;
+      }
+      .folder-item .badge-count,
+      .folder-item span:not(:first-child) {
+        display: none;
+      }
+      .user-profile-bar div div:nth-child(2) {
+        display: none;
+      }
+      .user-profile-bar {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+      }
+      .app-mail-list {
+        width: 260px;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .app-sidebar {
+        display: none;
+      }
+      .app-mail-list {
+        width: 100%;
+      }
+      .app-mail-reader {
+        display: none;
+      }
+    }
+    .reader-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-canvas);
+    }
+    .reader-subject {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .reader-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .reader-body {
+      padding: 32px 24px;
+      font-size: 15px;
+      color: var(--text-primary);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    /* 写信全屏视图 (登录后与app-view同级) */
+    .compose-view {
+      display: none; /* 激活时为 flex */
+      flex: 1;
+      flex-direction: column;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    /* 1. 顶部工具栏 */
+    .compose-top-toolbar {
+      height: 52px;
+      background: var(--bg-canvas);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 24px;
+    }
+    .compose-top-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--text-primary);
+      gap: 2px;
+    }
+    .compose-top-btn .icon {
+      font-size: 16px;
+    }
+    .compose-top-btn:hover {
+      color: var(--accent-orange);
+    }
+
+    /* 2. 写信主体两列布局 */
+    .compose-main-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      overflow: hidden;
+    }
+
+    .compose-left-pane {
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border-color);
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    /* 表单与右侧选项面板 CSS */
+    .form-row-line {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 16px;
+    }
+    .form-row-line .label {
+      width: 60px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+    .form-row-line .field {
+      flex: 1;
+    }
+    .form-row-line input, .form-row-line select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      outline: none;
+      background: var(--bg-canvas);
+    }
+    .field-icon-btn {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 0 10px;
+      cursor: pointer;
+    }
+
+    .pane-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .attach-drop-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius);
+      padding: 32px 16px;
+      text-align: center;
+      background: #ffffff;
+    }
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+    /* 富文本工具栏 CSS */
+    .wysiwyg-toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 6px 10px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+      margin-top: 8px;
+    }
+    .wysiwyg-btn {
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+      min-width: 28px;
+    }
+    .wysiwyg-btn:hover {
+      background: var(--bg-subtle);
+      border-color: var(--border-color);
+    }
+    .wysiwyg-select {
+      height: 28px;
+      padding: 2px 6px;
+      font-size: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: #ffffff;
+      outline: none;
+    }
+    .wysiwyg-separator {
+      width: 1px;
+      height: 18px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
+
+    /* 更多功能下拉菜单 CSS */
+    .more-func-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .more-func-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      box-shadow: var(--glass-shadow);
+      z-index: 3000;
+      min-width: 180px;
+      padding: 6px 0;
+    }
+    .more-func-menu.show {
+      display: block;
+    }
+    .more-func-item {
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s;
+    }
+    .more-func-item:hover {
+      background: var(--bg-subtle);
+      color: var(--accent-orange);
+    }
+    .more-func-item .menu-icon {
+      font-size: 15px;
+      width: 20px;
+      text-align: center;
+    }
+    /* HTML 源码编辑器 Modal CSS */
+    .html-code-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .html-code-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .html-code-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+      width: 92%;
+      max-width: 860px;
+      height: 82vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.92) translateY(16px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .html-code-modal.active .html-code-card {
+      transform: scale(1) translateY(0);
+    }
+    .html-code-header {
+      padding: 14px 24px;
+      background: rgba(15, 23, 42, 0.95);
+      color: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .html-code-body {
+      flex: 1;
+      background: #0f172a; /* 极简 Dark 代码编辑器 */
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+    .code-gutter {
+      width: 48px;
+      background: #1e293b;
+      color: #64748b;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.6;
+      padding: 16px 0;
+      text-align: right;
+      user-select: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .code-gutter-line {
+      padding-right: 10px;
+      height: 20px;
+    }
+    .code-editor-wrapper {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .code-editor-highlight, .code-editor-textarea {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 16px;
+      box-sizing: border-box;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      tab-size: 2;
+      white-space: pre;
+      overflow: auto;
+      word-break: normal;
+      word-wrap: normal;
+    }
+    .code-editor-highlight {
+      color: #e2e8f0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .code-editor-textarea {
+      color: transparent;
+      background: transparent;
+      caret-color: #38bdf8;
+      border: none;
+      outline: none;
+      resize: none;
+      z-index: 2;
+    }
+    /* Syntax Highlighting Colors */
+    .hl-tag { color: #f43f5e; font-weight: 600; }        /* 标签名 玫红 */
+    .hl-attr { color: #fb923c; }       /* 属性名 暖橙 */
+    .hl-val { color: #38bdf8; }        /* 属性值 青蓝 */
+    .hl-comm { color: #64748b; font-style: italic; }   /* 注释 灰紫 */
+    .hl-entity { color: #a855f7; }     /* 实体/括号 */
+    .html-code-footer {
+      padding: 14px 24px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  .wysiwyg-editor {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+    padding: 16px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-primary);
+    outline: none;
+    background: #ffffff;
+    overflow-y: auto;
+    line-height: 1.6;
+  }
+  .wysiwyg-editor:focus {
+    border-color: var(--accent-blue);
+    box-shadow: inset 0 0 0 1px var(--accent-blue);
+  }
+</style>
+</head>
+<body>
+
+  <!-- 全局导航栏 -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        中心服务邮局
+        <span class="badge">email.example.com</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="features.html">核心特性</a>
+        <a href="pricing.html">解决方案</a>
+        <a href="webmail.html" class="active">Webmail客户端</a>
+        <a href="admin.html">管理控制台</a>
+      </nav>
+      <div class="nav-actions">
+        <span id="nav-user-status" style="font-size: 13px; color: var(--text-secondary);">未登录</span>
+        <button id="nav-auth-btn" class="btn-cta" onclick="toggleAuthView()">登录邮箱</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="webmail-wrapper">
+    <!-- 登录视图 -->
+    <div id="view-login" class="login-view">
+      <div class="login-card">
+        <div class="login-logo">
+          📮 中心服务邮局 Webmail
+        </div>
+        <div class="login-desc">
+          登入您的企业专属邮箱 (email.example.com)，进行安全收发。
+        </div>
+        
+        <form onsubmit="handleWebmailLogin(event)">
+          <div class="form-group">
+            <label>完整邮箱地址 (Email Address)</label>
+            <input type="email" id="login-email" placeholder="no-reply@example.com" required value="no-reply@example.com">
+          </div>
+          
+          <div class="form-group">
+            <label>访问密码 (Password)</label>
+            <input type="password" id="login-password" placeholder="请输入密码" required value="admin">
+          </div>
+          
+          <button type="submit" id="login-submit-btn" class="btn-cta" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 8px;">登 录 邮 箱 兼 容 窗 口</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-secondary);">
+          默认凭据：no-reply@example.com / admin
+        </div>
+      </div>
+    </div>
+
+    <!-- 客户端工作区视图 (登录后显示) -->
+    <div id="view-app" class="app-view">
+      <!-- 侧边栏 -->
+      <div class="app-sidebar">
+        <div>
+          <div class="compose-btn-wrapper">
+            <button class="btn-compose" onclick="openComposeModal()">
+              <span>✏️</span> 撰写新邮件
+            </button>
+          </div>
+          
+          <ul class="folder-list">
+            <li class="folder-item active" onclick="switchFolder('inbox')">
+              <span>📥 收件箱</span>
+              <span class="badge-count" id="count-inbox">0</span>
+            </li>
+            <li class="folder-item" onclick="switchFolder('sent')">
+              <span>📤 已发送邮件</span>
+              <span class="badge-count" id="count-sent">0</span>
+            </li>
+            <li class="folder-item" onclick="switchFolder('drafts')">
+              <span>📝 草稿箱</span>
+              <span class="badge-count" id="count-drafts">0</span>
+            </li>
+            <li class="folder-item" onclick="switchFolder('junk')">
+              <span>⚠️ 垃圾邮件</span>
+              <span class="badge-count" id="count-junk">0</span>
+            </li>
+            <li class="folder-item" onclick="switchFolder('trash')">
+              <span>🗑️ 已删除邮件</span>
+              <span class="badge-count" id="count-trash">0</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="user-profile-bar">
+          <div>
+            <div style="font-weight: 600;" id="user-display-email">no-reply@example.com</div>
+            <div style="font-size: 11px; color: green;">● 在线 (IMAP/SMTP已鉴权)</div>
+          </div>
+          <button onclick="logoutWebmail()" style="background: none; border: none; color: var(--accent-orange); cursor: pointer; font-size: 12px;">注销</button>
+        </div>
+      </div>
+
+      <!-- 邮件列表区 -->
+      <div class="app-mail-list">
+        <div class="mail-list-header">
+          <span id="folder-title-text">收件箱</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="btn-restore-mail" onclick="restoreMails()" style="display: none; background: #2563eb; color: #ffffff; border: none; border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-weight: 500;">↩️ 恢复</button>
+            <label style="font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; user-select: none;">
+              <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this.checked)" style="cursor: pointer; accent-color: var(--accent-orange);">
+              全选
+            </label>
+            <button onclick="refreshMails()" style="background:none; border:none; cursor:pointer; font-size: 13px;">🔄 刷新</button>
+          </div>
+        </div>
+        <div id="mail-list-container">
+          <!-- 动态加载邮件项 -->
+        </div>
+      </div>
+
+      <!-- 邮件详情阅读区 -->
+      <div class="app-mail-reader" id="mail-reader-container">
+        <!-- 动态展示选中邮件 -->
+      </div>
+    </div>
+
+    <!-- 全屏写信视图 (完全复刻 Roundcube 布局) -->
+    <div id="view-compose" class="compose-view">
+      <!-- 顶部工具栏 -->
+      <div class="compose-top-toolbar">
+        <button class="compose-top-btn" onclick="saveDraft()"><span class="icon">💾</span>保存</button>
+        <button class="compose-top-btn" onclick="triggerFileSelect()"><span class="icon">📎</span>附加</button>
+        <button class="compose-top-btn"><span class="icon">✍️</span>签名</button>
+        <button class="compose-top-btn"><span class="icon">💬</span>回复</button>
+        <button class="compose-top-btn"><span class="icon">🔤</span>拼写</button>
+      </div>
+
+      <!-- 主体左右两列网格 -->
+      <div class="compose-main-grid">
+        <!-- 左侧编辑区 -->
+        <div class="compose-left-pane" id="compose-left-container">
+          <!-- 发件表单头信息 -->
+          <div class="form-row-line">
+            <span class="label">发件人</span>
+            <div class="field">
+              <select id="compose-from-select">
+                <option value="no-reply@example.com">no-reply@example.com</option>
+                <option value="admin@example.com">admin@example.com</option>
+                <option value="support@example.com">support@example.com</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row-line">
+            <span class="label">收件人</span>
+            <div class="field" style="display:flex; gap:8px;">
+              <input type="email" id="compose-to" placeholder="name@company.com" required style="flex:1;">
+              <button class="field-icon-btn" title="选择联系人">👥</button>
+              <button class="field-icon-btn" title="添加密送/抄送">＋</button>
+            </div>
+          </div>
+
+          <div class="form-row-line">
+            <span class="label">主　题</span>
+            <div class="field">
+              <input type="text" id="compose-subject" placeholder="请输入邮件主题" required>
+            </div>
+          </div>
+
+          <!-- 富文本 WYSIWYG 控制条 (完全复刻 Roundcube 工具条图标) -->
+          <div class="wysiwyg-toolbar">
+            <button class="wysiwyg-btn" onclick="execCmd('bold')" title="加粗 (Bold)"><b>B</b></button>
+            <button class="wysiwyg-btn" onclick="execCmd('italic')" title="斜体 (Italic)"><i>I</i></button>
+            <button class="wysiwyg-btn" onclick="execCmd('underline')" title="下划线 (Underline)"><u>U</u></button>
+            
+            <div class="wysiwyg-separator"></div>
+            
+            <button class="wysiwyg-btn" onclick="execCmd('justifyLeft')" title="左对齐">≡</button>
+            <button class="wysiwyg-btn" onclick="execCmd('justifyCenter')" title="居中对齐">≣</button>
+            <button class="wysiwyg-btn" onclick="execCmd('justifyRight')" title="右对齐">☲</button>
+            
+            <div class="wysiwyg-separator"></div>
+
+            <select class="wysiwyg-select" onchange="execCmd('fontName', this.value)">
+              <option value="Inter">Inter (默认)</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="JetBrains Mono">JetBrains Mono (代码)</option>
+            </select>
+
+            <select class="wysiwyg-select" onchange="execCmd('fontSize', this.value)">
+              <option value="3">10pt</option>
+              <option value="2">9pt</option>
+              <option value="4">12pt</option>
+              <option value="5">14pt</option>
+              <option value="6">18pt</option>
+            </select>
+
+            <div class="wysiwyg-separator"></div>
+
+            <button class="wysiwyg-btn" onclick="execCmd('insertUnorderedList')" title="无序列表">•≡</button>
+            <button class="wysiwyg-btn" onclick="execCmd('insertOrderedList')" title="有序列表">1.≡</button>
+            <button class="wysiwyg-btn" onclick="execCmd('outdent')" title="减少缩进">⇤</button>
+            <button class="wysiwyg-btn" onclick="execCmd('indent')" title="增加缩进">⇥</button>
+            <button class="wysiwyg-btn" onclick="execCmd('formatBlock', 'blockquote')" title="引用">”</button>
+
+            <div class="wysiwyg-separator"></div>
+
+            <button class="wysiwyg-btn" onclick="promptInsertLink()" title="插入链接">🔗</button>
+            <button class="wysiwyg-btn" onclick="execCmd('unlink')" title="取消链接">✂️</button>
+            <button class="wysiwyg-btn" onclick="promptInsertImage()" title="插入图片">🖼️</button>
+
+            <div class="wysiwyg-separator"></div>
+
+            <!-- 更多功能下拉菜单容器 -->
+            <div class="more-func-dropdown">
+              <button class="wysiwyg-btn" id="more-func-btn" onclick="toggleMoreMenu(event)" style="font-weight:bold;" title="更多功能">•••</button>
+              <div class="more-func-menu" id="more-func-menu">
+                <div class="more-func-item" onclick="triggerHtmlSourceModal()"><span class="menu-icon">&lt;&gt;</span>HTML 源码编辑</div>
+                <div class="more-func-divider"></div>
+                <div class="more-func-item" onclick="execCmd('removeFormat')"><span class="menu-icon">🧹</span>清除格式</div>
+                <div class="more-func-item" onclick="execCmd('insertHorizontalRule')"><span class="menu-icon">➖</span>插入分隔线</div>
+                <div class="more-func-item" onclick="execCmd('strikeThrough')"><span class="menu-icon">S</span>删除线</div>
+                <div class="more-func-item" onclick="execCmd('subscript')"><span class="menu-icon">x₂</span>下标</div>
+                <div class="more-func-item" onclick="execCmd('superscript')"><span class="menu-icon">x²</span>上标</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 编辑器大文本输入区 -->
+          <div class="editor-container">
+            <div class="wysiwyg-editor" id="compose-body-editor" contenteditable="true" placeholder="在此时直接撰写邮件正文或编辑内容..."></div>
+          </div>
+
+          <!-- 发送按钮动作条 (居左下角，标准蓝底白字) -->
+          <div class="compose-send-bar">
+            <button class="compose-send-btn" onclick="sendMailFromWebmail()" id="send-btn">
+              <span>🚀</span> 发 送
+            </button>
+            <button class="btn-outline" onclick="closeComposeView()" style="font-size:13px;">取消 / 返回</button>
+          </div>
+        </div>
+
+        <!-- 右侧选项与附件面板 -->
+        <div class="compose-right-pane" id="compose-right-container">
+          <div class="pane-title">选项和附件</div>
+          
+          <!-- 附件上传拖拽区 -->
+          <div class="attach-drop-zone">
+            <div style="font-size:28px; color:var(--text-secondary); margin-bottom:8px;">📥</div>
+            <div style="font-size:13px; color:var(--text-secondary);">上传附件最大不超过 5.0 MB</div>
+            <button class="btn-outline" style="margin-top:12px; font-size:12px; padding:6px 12px;">📎 添加附件</button>
+          </div>
+
+          <!-- 选项控制组 -->
+          <div class="options-group">
+            <div class="option-item">
+              <span>需要已读回执</span>
+              <input type="checkbox">
+            </div>
+            <div class="option-item">
+              <span>递送状态通知</span>
+              <input type="checkbox">
+            </div>
+            <div class="option-item">
+              <span>Keep formatting</span>
+              <input type="checkbox" checked>
+            </div>
+            <div class="option-item">
+              <span>优先级</span>
+              <select style="padding:4px 8px; font-size:13px; border:1px solid var(--border-color); border-radius:4px;">
+                <option value="normal">普通</option>
+                <option value="high">高</option>
+                <option value="low">低</option>
+              </select>
+            </div>
+            <div class="option-item">
+              <span>保存已发送邮件至</span>
+              <select style="padding:4px 8px; font-size:13px; border:1px solid var(--border-color); border-radius:4px;">
+                <option value="Sent">已发送邮件</option>
+                <option value="Drafts">草稿箱</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HTML 源码编辑 Modal 弹窗组件 -->
+    <div class="html-code-modal" id="html-source-modal">
+      <div class="html-code-card">
+        <div class="html-code-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>HTML 源码编辑器 (&lt;&gt;)</span>
+            <span style="font-size: 11px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-weight: 500;">Dark Theme</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-outline" style="padding: 4px 12px; font-size: 12px; color: #f8fafc; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);" onclick="formatHtmlSource()">✨ 一键格式化代码</button>
+            <span style="cursor: pointer; font-size: 16px; opacity: 0.8;" onclick="closeHtmlSourceModal()">✕</span>
+          </div>
+        </div>
+        <div class="html-code-body">
+          <!-- 动态固定的行号列 -->
+          <div class="code-gutter" id="code-gutter">
+            <div class="code-gutter-line">1</div>
+          </div>
+          <!-- 语法高亮与同步编辑区 -->
+          <div class="code-editor-wrapper">
+            <pre class="code-editor-highlight" id="code-highlight-layer" aria-hidden="true"></pre>
+            <textarea class="code-editor-textarea" id="html-source-input" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="在此粘贴或编辑 HTML 源代码..." oninput="onCodeInput()" onscroll="onCodeScroll()"></textarea>
+          </div>
+        </div>
+        <div class="html-code-footer">
+          <span style="font-size: 12px; color: var(--text-secondary);">提示：编辑后点击“应用并更新”将实时排版并渲染至富文本面板。</span>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn-outline" onclick="closeHtmlSourceModal()">取消</button>
+            <button class="btn-cta" onclick="applyHtmlSource()">应用并更新</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="particles.js"></script>
+  <script>
+    var currentFolder = 'inbox';
+    var selectedMailId = null;
+    var selectedMailIds = []; // 存储当前选中的邮件 ID 列表
+    var currentUserEmail = '';
+
+    // 创建新账号模版数据结构
+    function createEmptyMailData(email) {
+      return {
+        inbox: [],
+        sent: [],
+        drafts: [],
+        junk: [],
+        trash: []
+      };
+    }
+
+    var mailData = createEmptyMailData('');
+
+    // 按账号维度进行 localStorage 隔离恢复
+    function loadMailData(email) {
+      if (!email) return createEmptyMailData('');
+      var key = 'webmail_maildata_' + btoa(email);
+      var saved = localStorage.getItem(key);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          return createEmptyMailData(email);
+        }
+      }
+      return createEmptyMailData(email);
+    }
+
+    function saveMailData() {
+      if (!currentUserEmail) return;
+      var key = 'webmail_maildata_' + btoa(currentUserEmail);
+      localStorage.setItem(key, JSON.stringify(mailData));
+    }
+
+    // 页面加载自动检查 Session 登录状态
+    window.onload = function() {
+      checkServerSession();
+    };
+
+    function checkServerSession() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'auth_login.php?action=check', true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            try {
+              var res = JSON.parse(xhr.responseText);
+              if (res.status && res.user && res.user.email) {
+                currentUserEmail = res.user.email;
+                mailData = loadMailData(currentUserEmail);
+                showAppView(currentUserEmail);
+                fetchRemoteMails('inbox', false);
+                return;
+              }
+            } catch(e) {}
+          }
+          showLoginView();
+        }
+      };
+      xhr.send();
+    }
+
+    // 处理 Webmail 异步登录鉴权
+    function handleWebmailLogin(e) {
+      e.preventDefault();
+      var emailInput = document.getElementById('login-email');
+      var passInput = document.getElementById('login-password');
+      var submitBtn = document.getElementById('login-submit-btn');
+
+      var email = emailInput.value.trim();
+      var password = passInput.value.trim();
+
+      if (!email || !password) {
+        alert('请输入完整的邮箱地址与访问密码！');
+        return;
+      }
+
+      submitBtn.innerText = '正在校验底层 Mailcow 凭据...';
+      submitBtn.disabled = true;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'auth_login.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          submitBtn.innerText = '登 录 邮 箱 兼 容 窗 口';
+          submitBtn.disabled = false;
+          
+          if (xhr.status === 200) {
+            try {
+              var res = JSON.parse(xhr.responseText);
+              if (res.status) {
+                currentUserEmail = email;
+                localStorage.setItem('webmail_user', email);
+                mailData = loadMailData(email);
+                showAppView(email);
+                // 登录成功后立即拉取属于该账号的真实邮件
+                fetchRemoteMails('inbox', false);
+              } else {
+                alert('登录失败：' + (res.message || '凭据无效，Mailcow 拒绝访问'));
+              }
+            } catch(err) {
+              alert('服务器响应数据解析失败！');
+            }
+          } else {
+            alert('网络连接异常，请重试！');
+          }
+        }
+      };
+      xhr.send('email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password));
+    }
+
+    function showLoginView() {
+      document.getElementById('view-login').style.display = 'flex';
+      document.getElementById('view-app').style.display = 'none';
+      document.getElementById('nav-user-status').innerText = '未登录';
+      document.getElementById('nav-auth-btn').innerText = '登录邮箱';
+    }
+
+    function showAppView(email) {
+      document.getElementById('view-login').style.display = 'none';
+      document.getElementById('view-app').style.display = 'flex';
+      document.getElementById('user-display-email').innerText = email;
+      document.getElementById('nav-user-status').innerText = email;
+      document.getElementById('nav-auth-btn').innerText = '退出登录';
+      
+      // 动态切换写信发件人默认下拉框
+      var fromSelect = document.getElementById('compose-from-select');
+      if (fromSelect) {
+        fromSelect.innerHTML = `<option value="${email}">${email}</option>`;
+      }
+      renderMailList();
+    }
+
+    function logoutWebmail() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'auth_login.php?action=logout', true);
+      xhr.onreadystatechange = function() {
+        currentUserEmail = '';
+        localStorage.removeItem('webmail_user');
+        showLoginView();
+      };
+      xhr.send();
+    }
+
+    function toggleAuthView() {
+      if (localStorage.getItem('webmail_user')) {
+        logoutWebmail();
+      } else {
+        showLoginView();
+      }
+    }
+
+    function switchFolder(folder) {
+      currentFolder = folder;
+      selectedMailIds = []; // 切换文件夹时清空历史选中状态
+      selectedMailId = null;
+      // 样式切换
+      var items = document.querySelectorAll('.folder-item');
+      items.forEach(function(el) { el.classList.remove('active'); });
+      if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.add('active');
+      }
+      
+      var titles = {
+        inbox: '📥 收件箱',
+        sent: '📤 已发送邮件',
+        drafts: '📝 草稿箱',
+        junk: '⚠️ 垃圾邮件',
+        trash: '🗑️ 已删除邮件'
+      };
+      document.getElementById('folder-title-text').innerText = titles[folder] || '邮件列表';
+      renderMailList();
+    }
+
+    function updateFolderBadges() {
+      var countInbox = (mailData.inbox || []).length;
+      var countSent = (mailData.sent || []).length;
+      var countDrafts = (mailData.drafts || []).length;
+      var countJunk = (mailData.junk || []).length;
+      var countTrash = (mailData.trash || []).length;
+
+      var elInbox = document.getElementById('count-inbox');
+      var elSent = document.getElementById('count-sent');
+      var elDrafts = document.getElementById('count-drafts');
+      var elJunk = document.getElementById('count-junk');
+      var elTrash = document.getElementById('count-trash');
+
+      if (elInbox) elInbox.innerText = countInbox;
+      if (elSent) elSent.innerText = countSent;
+      if (elDrafts) elDrafts.innerText = countDrafts;
+      if (elJunk) elJunk.innerText = countJunk;
+      if (elTrash) elTrash.innerText = countTrash;
+    }
+
+    function renderMailList() {
+      updateFolderBadges();
+      var list = mailData[currentFolder] || [];
+      var container = document.getElementById('mail-list-container');
+      container.innerHTML = '';
+
+      var selectAllBox = document.getElementById('select-all-checkbox');
+
+      if (list.length === 0) {
+        if (selectAllBox) {
+          selectAllBox.checked = false;
+          selectAllBox.disabled = true;
+        }
+        selectedMailIds = [];
+        container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-secondary); font-size:13px;">此文件夹内暂无邮件</div>';
+        document.getElementById('mail-reader-container').innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:14px;">请从左侧选择一封邮件阅读</div>';
+        return;
+      }
+
+      if (selectAllBox) {
+        selectAllBox.disabled = false;
+      }
+
+      list.forEach(function(mail, index) {
+        var card = document.createElement('div');
+        card.className = 'mail-card-item' + (selectedMailId === mail.id || (selectedMailId === null && index === 0) ? ' active' : '');
+        card.onclick = function(e) {
+          if (e.target.tagName !== 'INPUT') {
+            selectMail(mail.id);
+          }
+        };
+        var isChecked = selectedMailIds.indexOf(String(mail.id)) !== -1;
+        card.innerHTML = `
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <input type="checkbox" class="mail-item-checkbox" data-id="${mail.id}" ${isChecked ? 'checked' : ''} onchange="onMailCheckChange(event, '${mail.id}')" style="margin-top: 3px; cursor: pointer; accent-color: var(--accent-orange);">
+            <div style="flex: 1; min-width: 0;">
+              <div class="sender">
+                <span>${mail.sender.split('<')[0]}</span>
+                <span class="date">${mail.date.split(' ')[1]}</span>
+              </div>
+              <div class="subject">${mail.subject}</div>
+              <div class="preview">${mail.body.replace(/<[^>]+>/g, '')}</div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      updateSelectAllStatus();
+
+      // 默认选中第一封
+      if (list.length > 0) {
+        var targetId = selectedMailId !== null ? selectedMailId : list[0].id;
+        selectMail(targetId);
+      }
+    }
+
+    function updateDeleteBtnText() {
+      var btn = document.getElementById('btn-delete-mail');
+      var restoreBtn = document.getElementById('btn-restore-mail');
+
+      // 控制“恢复”按钮只在「已删除邮件」(trash) 文件夹下显现
+      if (restoreBtn) {
+        if (currentFolder === 'trash') {
+          restoreBtn.style.display = 'inline-block';
+        } else {
+          restoreBtn.style.display = 'none';
+        }
+      }
+
+      if (!btn) return;
+      var list = mailData[currentFolder] || [];
+      var isAllSelected = list.length > 0 && selectedMailIds.length >= list.length;
+      if (isAllSelected) {
+        btn.innerText = '🗑️ 删除全部邮件';
+      } else if (selectedMailIds.length > 1) {
+        btn.innerText = '🗑️ 删除已选邮件 (' + selectedMailIds.length + ')';
+      } else {
+        btn.innerText = '🗑️ 删除此邮件';
+      }
+    }
+
+    function updateSelectAllStatus() {
+      var list = mailData[currentFolder] || [];
+      var selectAllBox = document.getElementById('select-all-checkbox');
+      if (!selectAllBox || list.length === 0) return;
+
+      var allChecked = list.length > 0 && list.every(function(m) {
+        return selectedMailIds.indexOf(String(m.id)) !== -1;
+      });
+      selectAllBox.checked = allChecked;
+      updateDeleteBtnText();
+    }
+
+    function toggleSelectAll(checked) {
+      var list = mailData[currentFolder] || [];
+      if (checked) {
+        selectedMailIds = list.map(function(m) { return String(m.id); });
+      } else {
+        selectedMailIds = [];
+      }
+      var checkboxes = document.querySelectorAll('.mail-item-checkbox');
+      checkboxes.forEach(function(cb) {
+        cb.checked = checked;
+      });
+      updateDeleteBtnText();
+    }
+
+    function onMailCheckChange(e, id) {
+      var strId = String(id);
+      var checked = e.target.checked;
+      var idx = selectedMailIds.indexOf(strId);
+      if (checked && idx === -1) {
+        selectedMailIds.push(strId);
+      } else if (!checked && idx !== -1) {
+        selectedMailIds.splice(idx, 1);
+      }
+      updateSelectAllStatus();
+    }
+
+    function restoreMails() {
+      var list = mailData.trash || [];
+      if (list.length === 0) return;
+
+      var targetMails = [];
+      if (selectedMailIds.length > 0) {
+        targetMails = list.filter(function(m) {
+          return selectedMailIds.indexOf(String(m.id)) !== -1;
+        });
+      } else if (selectedMailId !== null) {
+        var singleSel = list.find(function(m) { return String(m.id) === String(selectedMailId); });
+        if (singleSel) targetMails.push(singleSel);
+      } else if (list.length > 0) {
+        targetMails.push(list[0]);
+      }
+
+      if (targetMails.length === 0) {
+        alert('请先选择要恢复的邮件！');
+        return;
+      }
+
+      var confirmMsg = targetMails.length > 1 ? 
+        '确认要恢复选中的 ' + targetMails.length + ' 封邮件至「收件箱」吗？' : 
+        '确认要恢复这封邮件至「收件箱」吗？';
+      
+      if (!confirm(confirmMsg)) return;
+
+      var msgNums = targetMails.map(function(m) { return m.msg_num || 0; }).filter(function(n) { return n > 0; });
+
+      // 发起请求调用底层 IMAP 将邮件从 Trash 复制回 INBOX
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'delete_mail.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          var targetIds = targetMails.map(function(m) { return String(m.id); });
+
+          // 从 Trash 移除并追加回 Inbox
+          mailData.trash = list.filter(function(m) { return targetIds.indexOf(String(m.id)) === -1; });
+          if (!mailData.inbox) mailData.inbox = [];
+          targetMails.forEach(function(tm) {
+            mailData.inbox.unshift(tm);
+          });
+
+          selectedMailIds = [];
+          selectedMailId = null;
+          saveMailData();
+          renderMailList();
+          alert('邮件已成功恢复至「收件箱」。');
+        }
+      };
+      var params = 'msg_nums=' + encodeURIComponent(msgNums.join(',')) + '&folder=trash&action=restore';
+      xhr.send(params);
+    }
+
+    function deleteCurrentMail(id) {
+      var list = mailData[currentFolder] || [];
+      if (list.length === 0) return;
+
+      var targetMails = [];
+      var isAllOrBatch = selectedMailIds.length > 0;
+
+      if (isAllOrBatch) {
+        // 多选 / 全选删除模式
+        targetMails = list.filter(function(m) {
+          return selectedMailIds.indexOf(String(m.id)) !== -1;
+        });
+      } else if (id) {
+        // 单封删除模式
+        var single = list.find(function(m) { return String(m.id) === String(id); });
+        if (single) targetMails.push(single);
+      } else if (selectedMailId !== null) {
+        var singleSel = list.find(function(m) { return String(m.id) === String(selectedMailId); });
+        if (singleSel) targetMails.push(singleSel);
+      }
+
+      if (targetMails.length === 0) return;
+
+      var actionType = (currentFolder === 'trash') ? 'expunge' : 'delete';
+      var confirmMsg = '';
+
+      if (isAllOrBatch && selectedMailIds.length >= list.length) {
+        confirmMsg = (currentFolder === 'trash') ? '确认要彻底物理删除当前文件夹下的【全部邮件】吗？' : '确认要将当前文件夹下的【全部邮件】移至已删除邮件吗？';
+      } else if (targetMails.length > 1) {
+        confirmMsg = '确认要删除选中的 ' + targetMails.length + ' 封邮件吗？';
+      } else {
+        confirmMsg = (currentFolder === 'trash') ? '确认彻底删除这封邮件吗？彻底删除后将无法恢复！' : '';
+      }
+
+      if (confirmMsg && !confirm(confirmMsg)) return;
+
+      var msgNums = targetMails.map(function(m) { return m.msg_num || 0; }).filter(function(n) { return n > 0; });
+
+      // 同步调用后端底层 IMAP 服务器进行彻底/软删除
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'delete_mail.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          var targetIds = targetMails.map(function(m) { return String(m.id); });
+
+          if (currentFolder === 'trash') {
+            mailData[currentFolder] = list.filter(function(m) { return targetIds.indexOf(String(m.id)) === -1; });
+            alert('邮件已物理彻底删除。');
+          } else {
+            mailData[currentFolder] = list.filter(function(m) { return targetIds.indexOf(String(m.id)) === -1; });
+            if (!mailData.trash) mailData.trash = [];
+            targetMails.forEach(function(tm) {
+              mailData.trash.unshift(tm);
+            });
+            alert('邮件已成功移至「已删除邮件」箱。');
+          }
+          selectedMailIds = [];
+          selectedMailId = null;
+          saveMailData();
+          renderMailList();
+        }
+      };
+      var params = 'msg_nums=' + encodeURIComponent(msgNums.join(',')) + '&folder=' + encodeURIComponent(currentFolder) + '&action=' + encodeURIComponent(actionType);
+      xhr.send(params);
+    }
+
+    function selectMail(id) {
+      selectedMailId = id;
+      var list = mailData[currentFolder] || [];
+      var mail = list.find(function(m) { return m.id === id; });
+      if (!mail && list.length > 0) mail = list[0];
+
+      var reader = document.getElementById('mail-reader-container');
+      if (!mail) {
+        reader.innerHTML = '';
+        return;
+      }
+
+      reader.innerHTML = `
+        <div class="reader-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div class="reader-subject">${mail.subject}</div>
+            <div class="reader-meta">
+              <div><strong>发件人：</strong> ${mail.sender}</div>
+              <div><strong>收件人：</strong> ${mail.to}</div>
+              <div><strong>日　期：</strong> ${mail.date}</div>
+            </div>
+          </div>
+          <div>
+            <button class="btn-cta" id="btn-delete-mail" style="background:#dc2626; font-size:13px; padding:8px 16px; border-radius:8px;" onclick="deleteCurrentMail('${mail.id}')">🗑️ 删除此邮件</button>
+          </div>
+        </div>
+        <div class="reader-body">
+          ${mail.body}
+        </div>
+      `;
+
+      // 刷新卡片高亮
+      var cards = document.querySelectorAll('.mail-card-item');
+      cards.forEach(function(card, idx) {
+        if (list[idx] && list[idx].id === id) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+
+      updateDeleteBtnText();
+    }
+
+function toggleMoreMenu(e) {
+  e.stopPropagation();
+  var menu = document.getElementById('more-func-menu');
+  menu.classList.toggle('show');
+}
+
+// 触发与关闭 HTML 源码弹窗双向同步逻辑
+function highlightHTML(code) {
+  if (!code) return '';
+  // 转义 HTML 实体字符
+  var escaped = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // 正则高亮处理
+  return escaped
+    .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="hl-comm">$1</span>')
+    .replace(/(&lt;\/?[a-zA-Z0-9\-]+)/g, '<span class="hl-tag">$1</span>')
+    .replace(/([a-zA-Z\-]+)=/g, '<span class="hl-attr">$1</span>=')
+    .replace(/(".*?"|'.*? me')/g, '<span class="hl-val">$1</span>')
+    .replace(/(&gt;)/g, '<span class="hl-tag">$1</span>');
+}
+
+function updateLineNumbers(code) {
+  var lines = code.split('\n').length;
+  var gutter = document.getElementById('code-gutter');
+  if (!gutter) return;
+  var html = '';
+  for (var i = 1; i <= lines; i++) {
+    html += '<div class="code-gutter-line">' + i + '</div>';
+  }
+  gutter.innerHTML = html;
+}
+
+function onCodeInput() {
+  var textarea = document.getElementById('html-source-input');
+  var highlightLayer = document.getElementById('code-highlight-layer');
+  var val = textarea.value;
+
+  // 末尾换行补齐
+  if (val[val.length - 1] === '\n') {
+    val += ' ';
+  }
+
+  highlightLayer.innerHTML = highlightHTML(val);
+  updateLineNumbers(textarea.value);
+}
+
+function onCodeScroll() {
+  var textarea = document.getElementById('html-source-input');
+  var highlightLayer = document.getElementById('code-highlight-layer');
+  var gutter = document.getElementById('code-gutter');
+
+  highlightLayer.scrollTop = textarea.scrollTop;
+  highlightLayer.scrollLeft = textarea.scrollLeft;
+  gutter.scrollTop = textarea.scrollTop;
+}
+
+// HTML 格式化与美化算法 (支持纯文本转标准 HTML 段落/标签结构与 DOM 树排版)
+function prettyFormatHTML(htmlStr) {
+  if (!htmlStr) return '';
+  var text = htmlStr.trim();
+  
+  // 如果用户输入的不是包含 HTML 标签的代码（如纯文本“你好”），自动将其包裹为标准的 HTML 语义结构
+  if (!/<[a-z][\s\S]*>/i.test(text)) {
+    var paragraphs = text.split(/\n+/).filter(function(p){ return p.trim().length > 0; });
+    if (paragraphs.length === 0) return '<div>' + text + '</div>';
+    return paragraphs.map(function(p){
+      return '<p style="font-size: 14px; line-height: 1.6; color: #1a1f2e;">' + p.trim() + '</p>';
+    }).join('\n');
+  }
+
+  // 包含 HTML 标签时的 DOM/正则美化与树状缩进处理
+  var formatted = '';
+  var indent = 0;
+  // 给标签前后强制添加换行符分隔
+  var cleanHtml = text
+    .replace(/>\s*</g, '>\n<')
+    .replace(/(<[a-zA-Z0-9]+[^>]*>)/g, '\n$1\n')
+    .replace(/(<\/[a-zA-Z0-9]+>)/g, '\n$1\n');
+
+  var lines = cleanHtml.split('\n').map(function(line){ return line.trim(); }).filter(function(line){ return line.length > 0; });
+
+  lines.forEach(function(line) {
+    // 闭合标签递减缩进
+    if (line.match(/^<\/[a-zA-Z0-9]+/)) {
+      if (indent > 0) indent--;
+    }
+
+    var padding = '';
+    for (var i = 0; i < indent; i++) {
+      padding += '  ';
+    }
+
+    formatted += padding + line + '\n';
+
+    // 单向开始标签（非自闭合/非声明）递增缩进
+    if (line.match(/^<[a-zA-Z0-9]+[^>]*>/) && !line.match(/^<[a-zA-Z0-9]+[^>]*\/>/) && !line.match(/^<!/) && !line.match(/^<\/[a-zA-Z0-9]+/)) {
+      indent++;
+    }
+  });
+
+  return formatted.trim();
+}
+
+function formatHtmlSource() {
+  var textarea = document.getElementById('html-source-input');
+  if (!textarea || !textarea.value.trim()) return;
+  textarea.value = prettyFormatHTML(textarea.value);
+  onCodeInput();
+}
+
+function triggerHtmlSourceModal() {
+  var editor = document.getElementById('compose-body-editor');
+  var textarea = document.getElementById('html-source-input');
+  var modal = document.getElementById('html-source-modal');
+
+  // 格式化并填入代码
+  textarea.value = prettyFormatHTML(editor.innerHTML.trim());
+  onCodeInput();
+  modal.classList.add('active');
+}
+
+function closeHtmlSourceModal() {
+  var modal = document.getElementById('html-source-modal');
+  modal.classList.remove('active');
+}
+
+function applyHtmlSource() {
+  var textarea = document.getElementById('html-source-input');
+  var editor = document.getElementById('compose-body-editor');
+  editor.innerHTML = textarea.value;
+  closeHtmlSourceModal();
+}
+
+// 点击页面任意位置自动收起菜单
+    document.addEventListener('click', function() {
+      var menu = document.getElementById('more-func-menu');
+      if (menu && menu.classList.contains('show')) {
+        menu.classList.remove('show');
+      }
+    });
+
+    function execCmd(command, value = null) {
+      document.execCommand(command, false, value);
+      document.getElementById('compose-body-editor').focus();
+    }
+
+    function promptInsertLink() {
+      var url = prompt('请输入要插入的超链接 URL:', 'https://');
+      if (url) execCmd('createLink', url);
+    }
+
+function openComposeView() {
+  document.getElementById('view-app').style.display = 'none';
+  document.getElementById('view-compose').style.display = 'flex';
+}
+
+    function closeComposeView() {
+      document.getElementById('view-compose').style.display = 'none';
+      document.getElementById('view-app').style.display = 'flex';
+    }
+
+    function openComposeModal() {
+      openComposeView();
+    }
+
+    function sendMailFromWebmail() {
+      var to = document.getElementById('compose-to').value.trim();
+      var subject = document.getElementById('compose-subject').value.trim();
+      var body = document.getElementById('compose-body-editor').innerHTML.trim();
+      var fromUser = document.getElementById('compose-from-select').value;
+
+      if (!to || !subject || !body) {
+        alert('请完整填写收件人、主题和正文！');
+        return;
+      }
+
+      var sendBtn = document.getElementById('send-btn');
+      sendBtn.innerText = '发送中...';
+      sendBtn.disabled = true;
+
+      // 发起 AJAX 请求调用 send_code.php 传输 HTML / 纯文本
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'send_code.php', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          sendBtn.innerText = '🚀 发 送';
+          sendBtn.disabled = false;
+          if (xhr.status === 200) {
+            try {
+              var res = JSON.parse(xhr.responseText);
+              if (res.status) {
+                var now = new Date();
+                var timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+                
+                // 写入已发送列表并持久化保存
+                var newMail = {
+                  id: Date.now(),
+                  sender: '中心服务邮局 <' + fromUser + '>',
+                  to: to,
+                  date: timeStr,
+                  subject: subject,
+                  body: body
+                };
+                mailData.sent.unshift(newMail);
+                saveMailData();
+                document.getElementById('count-sent').innerText = mailData.sent.length;
+                
+                alert(res.message || ('邮件已成功解析 HTML 并通过 ' + fromUser + ' 投递与归档！'));
+                closeComposeView();
+                
+                // 清空写信表单内容
+                document.getElementById('compose-to').value = '';
+                document.getElementById('compose-subject').value = '';
+                document.getElementById('compose-body-editor').innerHTML = '';
+
+                // 自动切回「已发送邮件」列表并刷新渲染
+                switchFolder('sent');
+              } else {
+                alert('发送失败：' + (res.message || '未知错误'));
+              }
+            } catch (e) {
+              alert('解析服务器响应失败！');
+            }
+          } else {
+            alert('发送失败，请检查网络或配置重试。');
+          }
+        }
+      };
+      var params = 'email=' + encodeURIComponent(to) + '&subject=' + encodeURIComponent(subject) + '&custom_html=' + encodeURIComponent(body) + '&from_email=' + encodeURIComponent(fromUser);
+      xhr.send(params);
+    }
+
+    // 远程 IMAP 收信同步与增量合并
+    function fetchRemoteMails(folderName, showTip = true) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'fetch_mails.php?folder=' + encodeURIComponent(folderName), true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          try {
+            var res = JSON.parse(xhr.responseText);
+            if (res.code === 'AUTH_FAILED' || (res.status === false && res.message && res.message.indexOf('未授权') !== -1)) {
+              alert('您的邮箱账号不存在或已被管理员删除，系统已自动下线。');
+              logoutWebmail();
+              return;
+            }
+            if (res.status && Array.isArray(res.mails)) {
+              if (res.mails.length > 0) {
+                // 合并 IMAP 提取出的真实邮件与本地记录，去重
+                var existingIds = mailData[folderName].map(function(m){ return m.id; });
+                res.mails.forEach(function(m) {
+                  if (existingIds.indexOf(m.id) === -1) {
+                    mailData[folderName].unshift(m);
+                  }
+                });
+                saveMailData();
+                renderMailList();
+                if (showTip) alert('成功从底层邮局（IMAP）同步 ' + res.mails.length + ' 封新邮件！');
+              } else {
+                if (showTip) alert('底层邮局目前暂无更多新邮件。');
+              }
+            }
+          } catch(e) {
+            console.error(e);
+          }
+        }
+      };
+      xhr.send();
+    }
+
+    function refreshMails() {
+      selectedMailIds = []; // 刷新邮件列表时清空之前勾选的状态
+      fetchRemoteMails(currentFolder, true);
+      renderMailList();
+    }
+  </script>
+</body>
+</html>

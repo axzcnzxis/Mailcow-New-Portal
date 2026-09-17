@@ -1,0 +1,693 @@
+:root {
+  --bg-canvas: #f4f6f9;
+  --bg-panel: rgba(255, 255, 255, 0.58);
+  --bg-panel-solid: #ffffff;
+  --bg-subtle: rgba(240, 242, 245, 0.7);
+  
+  /* Aero Glass 经典透明及深层高斯模糊变量 */
+  --glass-bg: rgba(255, 255, 255, 0.52);
+  --glass-bg-hover: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-border-glow: rgba(236, 101, 43, 0.6);
+  --glass-shadow: 0 16px 40px -8px rgba(26, 31, 46, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  --glass-shadow-hover: 0 24px 50px -12px rgba(236, 101, 43, 0.22), 0 0 0 1.5px rgba(236, 101, 43, 0.5) inset;
+  --glass-blur: blur(24px) saturate(200%);
+
+  --border-color: rgba(232, 234, 237, 0.8);
+  --text-primary: #1a1f2e;
+  --text-secondary: #5f6368;
+  --accent-orange: #ec652b;
+  --accent-orange-hover: #d55520;
+  --accent-orange-glow: rgba(236, 101, 43, 0.35);
+  --accent-blue: #2563eb;
+  
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  /* 物理弹簧与阻尼微动贝塞尔曲线 */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);       /* 弹簧回弹曲线 */
+  --ease-out-physics: cubic-bezier(0.16, 1, 0.3, 1);      /* 物理惯性滑入 */
+  --ease-in-physics: cubic-bezier(0.7, 0, 0.84, 0);       /* 匀减速收回 */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(236, 101, 43, 0.12) 0px, transparent 55%),
+    radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.08) 0px, transparent 55%),
+    radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* 全屏动态粒子 Canvas 浮层 */
+#particles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* 经典 Aero Glass 毛玻璃组件及物理响应 */
+.aero-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s var(--ease-out-physics), 
+              box-shadow 0.4s var(--ease-out-physics), 
+              background 0.4s var(--ease-out-physics), 
+              border-color 0.4s var(--ease-out-physics);
+}
+
+.aero-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transition: left 0.8s var(--ease-out-physics);
+  pointer-events: none;
+}
+
+.aero-glass:hover::before {
+  left: 120%;
+}
+
+.aero-glass:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-glow);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-4px) scale(1.008);
+  transition-duration: 0.25s; /* 进场略快 */
+}
+
+.aero-glass:not(:hover) {
+  transition-duration: 0.6s; /* 退场平缓延迟，形成物理惯性残影 */
+}
+
+/* 浏览器无法支持 backdrop-filter 时自动回退 */
+@supports not (backdrop-filter: blur(1px)) {
+  .aero-glass {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* 物理弹簧关键帧动画 */
+@keyframes springPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(32px) scale(0.94);
+  }
+  70% {
+    opacity: 0.9;
+    transform: translateY(-4px) scale(1.015); /* 阻尼物理回弹 */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes waterfallSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-spring-in {
+  animation: springPopIn 0.8s var(--ease-spring) forwards;
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: waterfallSlide 0.75s var(--ease-out-physics) forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.08s; }
+.stagger-item:nth-child(2) { animation-delay: 0.16s; }
+.stagger-item:nth-child(3) { animation-delay: 0.24s; }
+.stagger-item:nth-child(4) { animation-delay: 0.32s; }
+.stagger-item:nth-child(5) { animation-delay: 0.40s; }
+
+/* 顶部 Aero 毛玻璃导航 */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+  transition: background 0.4s var(--ease-out-physics);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.nav-brand:hover {
+  transform: scale(1.04) translateY(-1px);
+}
+
+.nav-brand span.badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(236, 101, 43, 0.12);
+  color: var(--accent-orange);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(236, 101, 43, 0.25);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  position: relative;
+  padding: 6px 0;
+  transition: color 0.3s var(--ease-out-physics);
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2.5px;
+  background: var(--accent-orange);
+  transition: all 0.35s var(--ease-spring);
+  transform: translateX(-50%);
+  border-radius: 4px;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.nav-links a:hover::after, .nav-links a.active::after {
+  width: 100%;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 按钮流动光晕与微动反弹 */
+.btn-login {
+  font-size: 14px;
+  color: var(--accent-orange);
+  text-decoration: none;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  transition: all 0.3s var(--ease-spring);
+}
+
+.btn-login:hover {
+  background: rgba(236, 101, 43, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-cta {
+  background: linear-gradient(135deg, #ec652b 0%, #d55520 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px var(--accent-orange-glow);
+  transition: transform 0.3s var(--ease-spring), 
+              box-shadow 0.3s var(--ease-spring),
+              background 0.3s var(--ease-out-physics);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-cta::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out-physics);
+  pointer-events: none;
+}
+
+.btn-cta:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(236, 101, 43, 0.5);
+  color: #ffffff;
+}
+
+.btn-cta:hover::after {
+  opacity: 1;
+}
+
+.btn-cta:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 3px 10px var(--accent-orange-glow);
+  transition-duration: 0.08s;
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-primary);
+  border: 1.5px solid var(--glass-border);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--ease-spring), 
+              border-color 0.3s var(--ease-out-physics),
+              background 0.3s var(--ease-out-physics);
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-orange);
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.btn-outline:active {
+  transform: translateY(1px) scale(0.97);
+  transition-duration: 0.08s;
+}
+
+/* Hero Section */
+.hero-section {
+  padding: 80px 0;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  gap: 40px;
+  align-items: center;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-orange);
+  background: rgba(236, 101, 43, 0.1);
+  border: 1px solid rgba(236, 101, 43, 0.25);
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.hero-tag .dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent-orange);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent-orange);
+}
+
+.hero-title {
+  font-size: 52px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  font-size: 17px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 36px;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 16px;
+}
+
+.hero-panel {
+  padding: 36px;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.metric-item .metric-num {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent-orange);
+  margin-bottom: 4px;
+}
+
+.metric-item .metric-desc {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.flow-step {
+  text-align: center;
+}
+
+.step-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-orange);
+  margin: 0 auto 8px;
+  font-family: var(--font-mono);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.flow-step:hover .step-icon {
+  transform: scale(1.15) rotate(6deg);
+  border-color: var(--accent-orange);
+}
+
+.step-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.flow-arrow {
+  font-size: 16px;
+  color: var(--accent-orange);
+  font-weight: 700;
+}
+
+/* 权限矩阵表格与卡片 */
+.permission-section {
+  padding: 70px 0;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  padding: 16px;
+}
+
+.permission-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.permission-table th {
+  background: rgba(236, 101, 43, 0.08);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 16px 20px;
+  text-align: left;
+  border: none;
+}
+
+.permission-table th:first-child {
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+.permission-table th:last-child {
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+.permission-table td {
+  background: rgba(255, 255, 255, 0.65);
+  padding: 16px 20px;
+  font-size: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+  transition: background 0.3s var(--ease-out-physics), transform 0.3s var(--ease-spring);
+}
+
+.permission-table tr:hover td {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.permission-table td:first-child {
+  border-left: 1px solid rgba(255, 255, 255, 0.9);
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+  font-weight: 600;
+}
+
+.permission-table td:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.9);
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+.check-orange {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  background: var(--accent-orange);
+  color: #ffffff;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 3px 10px var(--accent-orange-glow);
+}
+
+.check-gray {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+/* 特性网格 */
+.features-section {
+  padding: 80px 0;
+}
+
+.feature-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+.feature-card {
+  padding: 36px;
+}
+
+.feature-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.feature-icon {
+  font-size: 30px;
+}
+
+.feature-card h3 {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* 输入框聚焦动态流转光晕 */
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s var(--ease-out-physics);
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+  border-color: var(--accent-orange);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px var(--accent-orange-glow);
+  transform: translateY(-1px);
+}
+
+/* Container & Typography */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section-title {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: -0.6px;
+  margin-bottom: 14px;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 52px;
+}
+
+/* 页脚 Aero Glass 化 */
+.site-footer {
+  background: rgba(26, 31, 46, 0.94);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: #ffffff;
+  padding: 64px 24px 32px;
+  margin-top: 80px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-col h4 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #ffffff; }
+.footer-col p { font-size: 14px; color: #9aa0a6; line-height: 1.6; margin-bottom: 16px; }
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a { font-size: 14px; color: #9aa0a6; text-decoration: none; transition: color 0.3s; }
+.footer-col ul li a:hover { color: #ffffff; }
+.footer-bottom { max-width: 1200px; margin: 32px auto 0; display: flex; flex-direction: column; gap: 16px; }
+.footer-bottom-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #9aa0a6; }
+.seo-tags { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: #80868b; }
+.seo-tags span::after { content: " /"; margin-left: 6px; }
+.seo-tags span:last-child::after { content: ""; }
+
+@media (max-width: 960px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .feature-cards-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 38px; }
+}

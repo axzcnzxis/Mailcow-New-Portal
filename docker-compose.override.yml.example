@@ -1,0 +1,28 @@
+# Mailcow 扩展 Docker Compose 配置文件示例
+# 使用方法：重命名为 docker-compose.override.yml 并放置于 /opt/mailcow-dockerized 目录下
+
+version: '3'
+services:
+  email-portal:
+    build: ./portal-web
+    container_name: email-service-portal
+    restart: always
+    environment:
+      - DB_HOST=mysql-mailcow
+      - DB_PORT=3306
+      - DB_NAME=mailcow
+      - DB_USER=mailcow
+      - DB_PASS=YOUR_MAILCOW_DB_PASS
+      - IMAP_HOST=dovecot-mailcow
+      - IMAP_PORT=143
+      - SMTP_HOST=postfix-mailcow
+      - SMTP_PORT=587
+    ports:
+      - "8088:80"
+    networks:
+      - mailcow-network
+
+networks:
+  mailcow-network:
+    external: true
+    name: mailcowdockerized_mailcow-network

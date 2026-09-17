@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>申请入驻与联系我们 - 中心服务邮局</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="site_config.js"></script>
+</head>
+<body>
+
+  <!-- 模块一：全局导航栏 Aero 毛玻璃 -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        中心服务邮局
+        <span class="badge">email.example.com</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="features.html">核心特性</a>
+        <a href="pricing.html">解决方案</a>
+        <a href="webmail.html">Webmail客户端</a>
+        <a href="admin.html">管理控制台</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="webmail.html" class="btn-login">登录邮箱</a>
+        <a href="contact.html" class="btn-cta active">注册域名邮箱</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 联系与申请主体 -->
+  <main class="container" style="padding: 60px 24px;">
+    <div class="animate-fade-in" style="text-align: center; max-width: 800px; margin: 0 auto 48px;">
+      <h1 style="font-size: 42px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; letter-spacing: -0.8px;">申请入驻与联系中心服务邮局</h1>
+      <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.6;">填写企业专属入驻申请，我们的技术架构专家将为您提供 100% 私有化部署与安全域名邮局配置支持。</p>
+    </div>
+
+    <div class="aero-glass animate-fade-in" style="max-width: 720px; margin: 0 auto; padding: 48px; animation-delay: 0.1s;">
+      <form onsubmit="handleApplySubmit(event)">
+        <div class="stagger-item" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px;">
+          <div class="form-group" style="margin:0;">
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;">您的姓名 / 负责人</label>
+            <input type="text" id="apply_name" placeholder="例如：张工 / IT总监" required>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;">企业名称</label>
+            <input type="text" id="apply_company" placeholder="例如：某某科技有限公司" required>
+          </div>
+        </div>
+
+        <div class="form-group stagger-item" style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;">现有主流邮箱地址（身份验证用）</label>
+          <input type="email" id="user_email" placeholder="admin@company.com" required>
+        </div>
+
+        <div class="stagger-item" style="display: flex; gap: 12px; margin-bottom: 20px; align-items: flex-end;">
+          <div class="form-group" style="flex: 1; margin:0;">
+            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;">HTML 邮件验证码</label>
+            <input type="text" id="apply_code" placeholder="输入 6 位验证码" required>
+          </div>
+          <button type="button" id="get_code_btn" class="btn-outline" style="padding: 12px 20px; white-space: nowrap; height: 46px;" onclick="sendVerificationCode()">获取验证码</button>
+        </div>
+
+        <script>
+          function sendVerificationCode() {
+            var emailInput = document.getElementById('user_email');
+            var email = emailInput.value.trim();
+            if (!email || !email.includes('@')) {
+              alert('请先输入正确的邮箱地址！');
+              emailInput.focus();
+              return;
+            }
+
+            var btn = document.getElementById('get_code_btn');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            btn.style.cursor = 'not-allowed';
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'send_code.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                  try {
+                    var res = JSON.parse(xhr.responseText);
+                    alert(res.message);
+                  } catch(e) {
+                    alert('验证码发送请求已处理，请查收收件箱。');
+                  }
+                } else {
+                  alert('发送请求异常，请重试。');
+                }
+              }
+            };
+            xhr.send('email=' + encodeURIComponent(email));
+
+            var countdown = 30;
+            var timer = setInterval(function() {
+              if (countdown > 0) {
+                btn.innerText = countdown + '秒后重试';
+                countdown--;
+              } else {
+                clearInterval(timer);
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.innerText = '获取验证码';
+              }
+            }, 1000);
+          }
+
+          function handleApplySubmit(e) {
+            e.preventDefault();
+            var name = document.getElementById('apply_name').value.trim();
+            var company = document.getElementById('apply_company').value.trim();
+            var email = document.getElementById('user_email').value.trim();
+            var domain = document.getElementById('apply_domain').value;
+            var prefix = document.getElementById('apply_prefix').value.trim();
+            var remarks = document.getElementById('apply_remarks').value.trim();
+
+            if (!name || !email || !prefix) {
+              alert('请完整填写申请人、主流邮箱与期望前缀！');
+              return;
+            }
+
+            var submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.innerText = '正在提交至管理审核队列...';
+            submitBtn.disabled = true;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'api_apply.php?action=submit', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState === 4) {
+                submitBtn.innerText = '提 交 企 业 入 驻 申 请';
+                submitBtn.disabled = false;
+                if (xhr.status === 200) {
+                  try {
+                    var res = JSON.parse(xhr.responseText);
+                    if (res.status) {
+                      alert(res.message);
+                      e.target.reset();
+                    } else {
+                      alert('提交失败：' + res.message);
+                    }
+                  } catch(err) {
+                    alert('系统处理异常');
+                  }
+                } else {
+                  alert('网络连接错误');
+                }
+              }
+            };
+            var params = 'name=' + encodeURIComponent(name) + '&company=' + encodeURIComponent(company) + '&email=' + encodeURIComponent(email) + '&domain=' + encodeURIComponent(domain) + '&prefix=' + encodeURIComponent(prefix) + '&remarks=' + encodeURIComponent(remarks);
+            xhr.send(params);
+          }
+        </script>
+
+        <div class="form-group stagger-item" style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;">选择期望的域名后缀</label>
+          <select id="apply_domain" required>
+            <option value="example.com">@example.com (中心服务邮局官方域)</option>
+            <option value="learnflow.edu.kg">@learnflow.edu.kg (教育专用域)</option>
+            <option value="secure-mail.net">@secure-mail.net (高防商务域)</option>
+          </select>
+        </div>
+
+        <div class="form-group stagger-item" style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;">期望的邮箱前缀 (账号名)</label>
+          <input type="text" id="apply_prefix" placeholder="例如：ceo 或 tech_support" required>
+        </div>
+
+        <div class="form-group stagger-item" style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;">自定义的需求与备注信息</label>
+          <textarea id="apply_remarks" rows="4" placeholder="请输入您的定制需求、预期用户量或特殊部署需求..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-cta stagger-item" style="width: 100%; padding: 14px; font-size: 16px;">提 交 企 业 入 驻 申 请</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>中心服务邮局</h4>
+        <p>私有化部署的安全堡垒，企业级通信的管理中枢。为中大型企业提供最高标准的独立域名邮箱与加密通信解决方案。</p>
+      </div>
+      <div class="footer-col">
+        <h4>客户端与控制台</h4>
+        <ul>
+          <li><a href="webmail.html">Webmail 客户端登录</a></li>
+          <li><a href="admin.html">邮局管理控制台</a></li>
+          <li><a href="features.html">四级权限管理说明</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>帮助与文档</h4>
+        <ul>
+          <li><a href="features.html">SMTP/IMAP 配置指南</a></li>
+          <li><a href="contact.html">获取邀请码</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>协议与隐私</h4>
+        <ul>
+          <li><a href="index.html">服务条款 (ToS)</a></li>
+          <li><a href="index.html">数据隐私政策</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-row">
+        <div>© 2026 中心服务邮局 email.example.com 保留所有权利。</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+<script src="particles.js"></script>
+</html>

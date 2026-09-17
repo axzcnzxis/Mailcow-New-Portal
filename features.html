@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心特性与权限架构 - 中心服务邮局</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="site_config.js"></script>
+</head>
+<body>
+
+  <!-- 模块一：全局导航栏 -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        中心服务邮局
+        <span class="badge">email.example.com</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="features.html" class="active">核心特性</a>
+        <a href="pricing.html">解决方案</a>
+        <a href="webmail.html">Webmail客户端</a>
+        <a href="admin.html">管理控制台</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="webmail.html" class="btn-login">登录邮箱</a>
+        <a href="contact.html" class="btn-cta">注册域名邮箱</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 页面主体内容 -->
+  <main class="container" style="padding: 60px 24px;">
+    <div style="text-align: center; max-width: 800px; margin: 0 auto 56px;">
+      <h1 style="font-size: 40px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px;">功能详情与四级权限深度解析</h1>
+      <p style="font-size: 16px; color: var(--text-secondary);">从底层 Mailcow 容器联动到端到端加密、双重验证与细粒度发信控制，全方位保障企业通信资产安全。</p>
+    </div>
+
+    <!-- 模块详情一：四级权限细解 -->
+    <div style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 40px; margin-bottom: 40px; box-shadow: var(--shadow-sm);">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">1. 精细化四级权限矩阵说明</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 24px; line-height: 1.7;">
+        中心服务邮局采用严格的分级管理授权模型，杜绝越权访问与数据泄露风险：
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+        <div style="background: var(--bg-canvas); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color);">
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--accent-orange);">👑 超级管理员 (SuperAdmin)</h3>
+          <p style="font-size: 14px; color: var(--text-secondary);">拥有系统最高权限，可进行 Mailcow 底层联动、全局 UI 定制、跨域名全量邮箱管理与系统级安全审计。</p>
+        </div>
+        <div style="background: var(--bg-canvas); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color);">
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">🛡️ 管理员 (Admin)</h3>
+          <p style="font-size: 14px; color: var(--text-secondary);">管理指定一个或多个域名的全部账号，分配配额、控制收发信策略及查看安全日志。</p>
+        </div>
+        <div style="background: var(--bg-canvas); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color);">
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">🔑 域名管理员 (DomainAdmin)</h3>
+          <p style="font-size: 14px; color: var(--text-secondary);">负责单个特定域名的日常账号创建、密码重置与邮箱状态调整。</p>
+        </div>
+        <div style="background: var(--bg-canvas); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color);">
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">👤 下属管理员 (SubAdmin)</h3>
+          <p style="font-size: 14px; color: var(--text-secondary);">对部分指定邮箱拥有有限的管理与维护权限，职责清晰边界明确。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模块详情二：安全与策略特性 -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 32px; margin-bottom: 40px;">
+      <div style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 32px;">
+        <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">🔒 双重验证与严格注册</h3>
+        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+          所有新用户入驻均需通过现有主流企业邮箱（Google/Microsoft/QQ等）身份校验，结合 HTML 动态验证码与自定义邀请码机制，将未知风险拦截在系统之外。
+        </p>
+        <a href="contact.html" class="btn-outline" style="display: inline-block;">申请入驻测试 →</a>
+      </div>
+
+      <div style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 32px;">
+        <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">🗑️ 两阶段安全删除机制</h3>
+        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+          邮件删除支持两道防线：第一阶段软删除（移至已删除文件夹，可随时一键恢复）；第二阶段需二次确认的服务器彻底物理硬删除，确保机密文档绝不因误操作永久丢失。
+        </p>
+        <a href="webmail.html" class="btn-outline" style="display: inline-block;">体验 Webmail 客户端 →</a>
+      </div>
+
+      <div style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 32px;">
+        <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">⚙️ 细粒度收发策略与配额</h3>
+        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+          管理员可对任意账号一键设置「完全收发」、「仅收信（防止离职员工外发）」、「仅发信」等状态，并可严格限制每日/周/月发信额度与附件大小。
+        </p>
+        <a href="admin.html" class="btn-outline" style="display: inline-block;">查看管理控制台 →</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- 模块七：页脚 -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>中心服务邮局</h4>
+        <p>私有化部署的安全堡垒，企业级通信的管理中枢。</p>
+        <div class="seo-tags">
+          <span>自建邮局</span>
+          <span>企业邮箱</span>
+          <span>Mailcow</span>
+          <span>Roundcube</span>
+          <span>私有化部署</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>客户端与控制台</h4>
+        <ul>
+          <li><a href="webmail.html">Webmail 客户端登录</a></li>
+          <li><a href="admin.html">邮局管理控制台</a></li>
+          <li><a href="features.html">四级权限管理说明</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>帮助与文档</h4>
+        <ul>
+          <li><a href="features.html">SMTP/IMAP 配置指南</a></li>
+          <li><a href="contact.html">获取邀请码</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>协议与隐私</h4>
+        <ul>
+          <li><a href="index.html">服务条款 (ToS)</a></li>
+          <li><a href="index.html">数据隐私政策</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-row">
+        <div>© 2026 中心服务邮局 email.example.com 保留所有权利。</div>
+        <div>Enterprise Secure Mail Infrastructure</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+<script src="particles.js"></script>
+</html>
