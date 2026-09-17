@@ -1,6 +1,7 @@
 # 🚀 Mailcow-New-Portal (Mailcow 邮局全新的界面与 UI 管理控制台)
 
 [![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-red.svg)](LICENSE)
+[![Maintenance Guide](https://img.shields.io/badge/Maintenance-Guide-purple.svg)](MAINTENANCE.md)
 [![Commercial License Contact](https://img.shields.io/badge/Commercial%20License-Apply%20Now-green.svg)](mailto:admin@myhomeyin.help?subject=Mailcow-New-Portal%20商业授权申请)
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)](https://www.docker.com/)
 [![Mailcow](https://img.shields.io/badge/Mailcow-Compatible-orange.svg)](https://mailcow.email/)
@@ -9,12 +10,17 @@ Mailcow-New-Portal 是一款专为 **Mailcow: dockerized** 邮件系统打造的
 
 ---
 
-## ⛔ 开源许可与商业授权申请通道
+## ⛔ 开源许可、维护说明与商业授权
 
 > **⚠️ 使用协议与版权声明：**  
 > 本项目源码遵循 **[自定义非商业许可证 (Custom Non-Commercial License)](LICENSE)** 开源：
 > - **个人 / 非盈利使用**：允许个人学习、研究及非商业性免费部署使用。
 > - **商业使用限制**：未经原作者本人明确书面许可，**严禁**将本项目源码、打包镜像或衍生作品用于任何商业售卖、付费交付、二次打包转售或作为商业付费产品/服务的一部分进行盈利。
+
+### 🤖 AI 开发与维护免责声明
+- **本系统由个人借助 AI 编码助手开发完成**。
+- **原作者不承诺提供长期持续的版本迭代、功能维护或一对一技术支持**。
+- 如需深入了解系统架构、组件对接逻辑或自行修复 Bug / 二次开发，请参阅独立的 **[🛠️ 项目维护与二次开发指南 (MAINTENANCE.md)](MAINTENANCE.md)**。
 
 ### 💼 商业授权申请通道 (Commercial Authorization Application)
 
