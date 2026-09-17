@@ -1,10 +1,19 @@
 # 🚀 Mailcow-New-Portal (Mailcow 邮局全新的界面与 UI 管理控制台)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-red.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)](https://www.docker.com/)
 [![Mailcow](https://img.shields.io/badge/Mailcow-Compatible-orange.svg)](https://mailcow.email/)
 
 Mailcow-New-Portal 是一款专为 **Mailcow: dockerized** 邮件系统打造的**现代化、高颜值、轻量化前端门户与 UI 管理控制台**。它集成了原生 Webmail 邮件客户端、自定义 HTML/富文本发信引擎、四级管理员权限控制中枢以及全站 UI 动态品牌定制功能，能够帮助运维人员与企业无缝升级 Mailcow 的用户交互体验。
+
+---
+
+## ⛔ 开源与使用许可声明 (非商业使用)
+
+> **⚠️ 重要声明：**  
+> 本项目源码遵循 **自定义非商业许可证 (Custom Non-Commercial License)** 开源：
+> - 允许个人学习、研究及非商业性免费部署使用。
+> - **未经原作者本人明确书面允许，严禁将本项目源码、打包镜像或衍生作品用于任何商业售卖、打包转售或作为商业付费软件/服务的一部分进行盈利。**
 
 ---
 
@@ -182,16 +191,7 @@ docker compose build email-portal && docker compose up -d email-portal
 
 ---
 
-## ❓ 常见问题 (FAQ)
+## 📄 开源与版权许可证
 
-#### Q1: 是否会影响原有的 Mailcow 官方后台？
-**完全不会**。本 Portal 作为一个独立的扩展容器运行在指定端口（如 8088）， Mailcow 官方原有的 80/443 端口后台与 Webmail 依然照常工作。
-
-#### Q2: 提示数据库连接失败 (Access denied) 怎么办？
-请确认 docker-compose.override.yml 中的 DB_PASS 与 /opt/mailcow-dockerized/mailcow.conf 中的 DBPASS 一致，并确保容器共享了 mailcowdockerized_mailcow-network 网络。
-
----
-
-## 📄 开源许可证
-
-本项目采用 [MIT License](LICENSE) 开源许可证。
+本项目采用 [Custom Non-Commercial License (自定义非商业开源许可证)](LICENSE)。  
+**非商业用途免费授权；未经原作者授权严禁用于任何商业贩售与盈利行为。**
