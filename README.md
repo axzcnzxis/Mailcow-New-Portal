@@ -1,52 +1,99 @@
-# Email Service Portal (Mailcow 前端控制台与 Webmail 门户)
+# 🚀 Mailcow-New-Portal (Mailcow 邮局全新的界面与 UI 管理控制台)
 
-轻量级、响应式、原生的 Mailcow 邮件系统定制前端门户与 UI 管理控制台。原生集成 Mailcow 引擎底层 API，支持 Webmail 邮箱收发、自定义 HTML 内容发信、管理员四级权限中枢以及全站动态 UI 品牌自定。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)](https://www.docker.com/)
+[![Mailcow](https://img.shields.io/badge/Mailcow-Compatible-orange.svg)](https://mailcow.email/)
 
----
-
-## 🌟 核心特性
-
-- 📬 **原生 Webmail 客户端**：内置极简流畅的 Webmail 界面，支持邮件列表查看、实时接收与正文渲染。
-- ✉️ **支持 HTML 自定义发信**：富文本 / 自定义 HTML 内容发信，内置自动模板与邮件源码预览能力。
-- 🛡️ **四级权限管理中枢 (dmin.html)**：
-  - 👑 **超级管理员** (dmin@example.com)：运维管理与 Mailcow 底层联动。
-  - 🛡️ **管理员** (support@example.com)：配额与商务账号控制。
-  - 🔑 **域名管理员** (security@example.com)：安全审计与域名 DNS 检查。
-  - 👤 **下属管理员** (
-o-reply@example.com)：自动化发信与留痕。
-- 🎨 **全站 UI 在线品牌定制**：后台在线修改站点名称、Hero 标语、主题颜色与导航菜单，实时生效。
-- 🐳 **Docker 极速容器化部署**：基于 Alpine PHP-FPM + Nginx，资源占用极低（< 30MB 内存）。
+Mailcow-New-Portal 是一款专为 **Mailcow: dockerized** 邮件系统打造的**现代化、高颜值、轻量化前端门户与 UI 管理控制台**。它集成了原生 Webmail 邮件客户端、自定义 HTML/富文本发信引擎、四级管理员权限控制中枢以及全站 UI 动态品牌定制功能，能够帮助运维人员与企业无缝升级 Mailcow 的用户交互体验。
 
 ---
 
-## 🏗️ 架构与数据流设计
+## 📸 界面预览与系统定位
+
+本系统以子容器的形式原生挂载到 Mailcow 的 Docker 容器网络中，与 Mailcow 共享底层的 **MySQL 数据库**、**Dovecot (IMAP)** 以及 **Postfix (SMTP)** 服务。
 
 `	ext
-[ 浏览器 (Web Interface) ]
-         │
-         ├──> [ Nginx + PHP-FPM (email-portal 容器) ] ── (Port 8088)
-                     │
-                     ├───> MySQL (mysql-mailcow) ──── 账号鉴权 & 站点配置
-                     ├───> Dovecot (dovecot-mailcow) ── IMAP 邮件读取
-                     └───> Postfix (postfix-mailcow) ── SMTP 邮件发送
+                                [ 用户/管理员 浏览器 ]
+                                           │
+                                           ▼ (端口 8088 / 自定义)
+                       ┌───────────────────────────────────────┐
+                       │  email-service-portal (PHP 8.2+Nginx) │
+                       └───────────────────┬───────────────────┘
+                                           │ (Docker 内部网络)
+           ┌───────────────────────────────┼───────────────────────────────┐
+           ▼                               ▼                               ▼
+ ┌───────────────────┐           ┌───────────────────┐           ┌───────────────────┐
+ │   mysql-mailcow   │           │  dovecot-mailcow  │           │  postfix-mailcow  │
+ │ (鉴权/配额/站点配置)│           │   (IMAP 接收邮件) │           │   (SMTP 发送邮件) │
+ └───────────────────┘           └───────────────────┘           └───────────────────┘
 `
 
 ---
 
-## 🛠️ 部署指南 (基于 Mailcow Docker)
+## ✨ 完整功能特性列表
 
-### 1. 克隆本仓库到 Mailcow 目录
+### 1. 📬 极简 Webmail 客户端 (webmail.html)
+- **邮件收件箱查看**：通过底层 IMAP 协议无缝连接 Mailcow Dovecot，实现邮件列表实时拉取与阅读。
+- **邮件详情与源码解析**：支持 Plain Text 与 HTML 富文本邮件渲染，智能解析收件人、发件人及时间戳。
+- **邮件删除与管理**：提供单封/批量邮件删除接口，同步更新服务器端 mailbox 状态。
 
-将代码放至 Mailcow 主目录下的 portal-web 文件夹中：
+### 2. ✉️ 支持 HTML 自定义发信与富文本编辑器
+- **自定义 HTML 内容发信**：突破传统纯文本限制，支持直接粘贴或编写 HTML 源码进行专业邮件排版。
+- **实时效果预览**：内置发信预览窗口，可即时预览 HTML 标签在邮件客户端中的实际呈现样式。
+- **动态变量插入**：支持自动识别模板变量，适合系统自动化通知、营销邮件及验证码发送。
+
+### 3. 🛡️ 四级权限鉴权管理中枢 (dmin.html)
+基于原生角色与权限设计的管理控制台，支持针对不同管理层级进行精准赋权：
+
+| 角色级别 | 代表账号 (示例) | 权限说明 |
+| :--- | :--- | :--- |
+| 👑 **超级管理员** | dmin@example.com | IT 运维与 Mailcow 底层盘联动，拥有系统所有配置最高控制权 |
+| 🛡️ **管理员** | support@example.com | 商务与多域配额管制、域名配置及用户账号配额调整 |
+| 🔑 **域名管理员** | security@example.com | 安全与合规审计、域名 DNS 解析一键检测与记录审查 |
+| 👤 **下属管理员** | 
+o-reply@example.com | 系统自动化发信、操作日志查询与留痕审计 |
+
+- **域名 DNS 一键检测**：自动抓取并校验 MX、SPF、DKIM 及 DMARC 记录，诊断域名解析健康度。
+- **邮箱账号动态管理**：支持在后台面板快速创建新邮箱账号、修改密码、分配存储配额等。
+
+### 4. 🎨 全站 UI 动态品牌定制系统
+- **无需改动代码**：后台提供【全站 UI 与品牌配置】可视化面板，修改后**即刻生效，无需重启容器**。
+- **定制范围**：
+  - 全站名称（如“XX集团专属邮局”）
+  - Hero 标语与描述文案
+  - 顶栏与底栏导航菜单项
+  - 系统主题颜色与亮暗高亮样式
+
+---
+
+## 🛠️ 详细安装与部署教程 (基于 Mailcow Docker)
+
+### 前置要求
+1. 服务器已成功安装并运行 **Mailcow: dockerized** 系统（安装路径默认为 /opt/mailcow-dockerized）。
+2. 服务器支持 Docker 与 Docker Compose 命令。
+
+---
+
+### 第一步：克隆本仓库到 Mailcow 目录
+
+登录云服务器终端，进入 Mailcow 目录，将本仓库克隆为 portal-web 文件夹：
 
 `ash
 cd /opt/mailcow-dockerized
-git clone https://github.com/YOUR_USERNAME/email-portal.git portal-web
+git clone https://github.com/axzcnzxis/Mailcow-New-Portal.git portal-web
 `
 
-### 2. 配置 docker-compose.override.yml
+---
 
-在 /opt/mailcow-dockerized 目录下创建 docker-compose.override.yml：
+### 第二步：配置 docker-compose.override.yml
+
+在 /opt/mailcow-dockerized 根目录下新建或修改 docker-compose.override.yml 文件：
+
+`ash
+nano /opt/mailcow-dockerized/docker-compose.override.yml
+`
+
+填入以下内容（**注意修改 DB_PASS 为您真实的 Mailcow 数据库密码**）：
 
 `yaml
 version: '3'
@@ -60,13 +107,13 @@ services:
       - DB_PORT=3306
       - DB_NAME=mailcow
       - DB_USER=mailcow
-      - DB_PASS=YOUR_MAILCOW_DB_PASSWORD
+      - DB_PASS=YOUR_REAL_MAILCOW_DB_PASSWORD # 👈 替换为您 mailcow.conf 中的 DBPASS 值
       - IMAP_HOST=dovecot-mailcow
       - IMAP_PORT=143
       - SMTP_HOST=postfix-mailcow
       - SMTP_PORT=587
     ports:
-      - "8088:80"
+      - "8088:80" # 👈 左侧 8088 为对外访问端口，可按需更改
     networks:
       - mailcow-network
 
@@ -76,37 +123,75 @@ networks:
     name: mailcowdockerized_mailcow-network
 `
 
-### 3. 启动容器
+> **💡 如何获取您的 Mailcow 数据库密码？**  
+> 运行命令 grep DBPASS /opt/mailcow-dockerized/mailcow.conf 即可查看。
+
+---
+
+### 第三步：构建并启动子容器
+
+在 /opt/mailcow-dockerized 目录下执行构建与启动命令：
 
 `ash
+docker compose build email-portal
 docker compose up -d email-portal
 `
 
-访问 http://<YOUR-SERVER-IP>:8088 即可使用系统。
+启动完成后，检查容器运行状态：
+`ash
+docker ps | grep email-service-portal
+`
 
 ---
 
-## 🔐 预设初始账号与测试
+### 第四步：访问与初始登录
 
-- **控制台地址**：http://<YOUR-SERVER-IP>:8088/admin.html
-- **默认超级管理员**：dmin@example.com
-- **默认初始密码**：dmin
+在浏览器中打开：
+- **Webmail / 首页地址**：http://<您的服务器IP>:8088/
+- **管理控制台地址**：http://<您的服务器IP>:8088/admin.html
+
+**预设初始登录凭据：**
+- **管理员账号**：dmin@example.com （或您的 Mailcow 管理员邮箱）
+- **初始默认密码**：dmin
 
 ---
 
-## 🎨 前端 UI 更改与定制方式
+## 🖌️ 如何修改和二次开发前端界面？
 
-在容器运行后，更改前端界面有以下 **3 种方式**：
+打包成 Docker 之后，修改网页前端共有 **3 种灵活方便的方式**：
 
-1. **后台在线动态配置（推荐，无需重启）**：
-   登录 dmin.html 进入【全站 UI 与品牌配置】，即可在线编辑站点名称、标语与菜单，保存即生效。
-2. **宿主机目录挂载（二次开发推荐）**：
-   在 docker-compose.override.yml 中配置 olumes: - ./portal-web:/www/wwwroot/email_service_portal，编辑 HTML/CSS 文件保存后刷新浏览器即可实时预览。
-3. **重新构建镜像（固化版本）**：
-   docker compose build email-portal && docker compose up -d email-portal
+### 方式一：管理员后台在线修改（最简单，无需修改代码/不重启）
+1. 登录 dmin.html 控制台。
+2. 进入【全站 UI 与品牌配置】选项卡。
+3. 修改品牌名称、标语、主题色及导航菜单，点击保存**即刻生效**。
+
+### 方式二：宿主机目录挂载（推荐！修改 HTML/CSS 实时刷新）
+在 docker-compose.override.yml 中添加挂载卷配置：
+`yaml
+    volumes:
+      - ./portal-web:/www/wwwroot/email_service_portal
+`
+直接编辑宿主机 ./portal-web 目录下的 index.html 或 style.css，**保存后直接刷新浏览器即可看到变化**。
+
+### 方式三：重新构建容器镜像（适用于固化发布版本）
+修改完本地源码文件后，运行以下指令：
+`ash
+docker compose build email-portal && docker compose up -d email-portal
+`
+重构过程只需 **2~3 秒**，完全不影响底层 Mailcow 邮箱服务。
+
+---
+
+## ❓ 常见问题 (FAQ)
+
+#### Q1: 是否会影响原有的 Mailcow 官方后台？
+**完全不会**。本 Portal 作为一个独立的扩展容器运行在指定端口（如 8088）， Mailcow 官方原有的 80/443 端口后台与 Webmail 依然照常工作。
+
+#### Q2: 提示数据库连接失败 (Access denied) 怎么办？
+请确认 docker-compose.override.yml 中的 DB_PASS 与 /opt/mailcow-dockerized/mailcow.conf 中的 DBPASS 一致，并确保容器共享了 mailcowdockerized_mailcow-network 网络。
 
 ---
 
 ## 📄 开源许可证
 
-MIT License
+本项目采用 [MIT License](LICENSE) 开源许可证。
