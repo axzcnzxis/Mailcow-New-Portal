@@ -1,6 +1,7 @@
 # 🚀 Mailcow-New-Portal (Mailcow 邮局全新的界面与 UI 管理控制台)
 
 [![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-red.svg)](LICENSE)
+[![Commercial License Contact](https://img.shields.io/badge/Commercial%20License-Apply%20Now-green.svg)](mailto:admin@myhomeyin.help?subject=Mailcow-New-Portal%20商业授权申请)
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)](https://www.docker.com/)
 [![Mailcow](https://img.shields.io/badge/Mailcow-Compatible-orange.svg)](https://mailcow.email/)
 
@@ -8,12 +9,23 @@ Mailcow-New-Portal 是一款专为 **Mailcow: dockerized** 邮件系统打造的
 
 ---
 
-## ⛔ 开源与使用许可声明 (非商业使用)
+## ⛔ 开源许可与商业授权申请通道
 
-> **⚠️ 重要声明：**  
-> 本项目源码遵循 **自定义非商业许可证 (Custom Non-Commercial License)** 开源：
-> - 允许个人学习、研究及非商业性免费部署使用。
-> - **未经原作者本人明确书面允许，严禁将本项目源码、打包镜像或衍生作品用于任何商业售卖、打包转售或作为商业付费软件/服务的一部分进行盈利。**
+> **⚠️ 使用协议与版权声明：**  
+> 本项目源码遵循 **[自定义非商业许可证 (Custom Non-Commercial License)](LICENSE)** 开源：
+> - **个人 / 非盈利使用**：允许个人学习、研究及非商业性免费部署使用。
+> - **商业使用限制**：未经原作者本人明确书面许可，**严禁**将本项目源码、打包镜像或衍生作品用于任何商业售卖、付费交付、二次打包转售或作为商业付费产品/服务的一部分进行盈利。
+
+### 💼 商业授权申请通道 (Commercial Authorization Application)
+
+如果您或您的企业希望将 Mailcow-New-Portal 整合进商业产品、提供商业安装交付服务、二次开发或作为付费系统销售，请通过官方通道向原作者提交**商业授权申请**：
+
+- 📧 **官方授权邮箱**：[dmin@myhomeyin.help](mailto:admin@myhomeyin.help)
+- 📝 **邮件申请格式建议**：
+  - **邮件主题**：[商业授权申请] Mailcow-New-Portal - 公司/个人名称
+  - **申请主体信息**：公司全称 / 团队或个人名称 / 联系电话
+  - **使用场景说明**：拟使用的商业场景（如客户系统定制、私有化部署交付、商业集成等）
+  - **预计部署规模**：预计部署的服务器数量或企业用户规模
 
 ---
 
@@ -194,4 +206,4 @@ docker compose build email-portal && docker compose up -d email-portal
 ## 📄 开源与版权许可证
 
 本项目采用 [Custom Non-Commercial License (自定义非商业开源许可证)](LICENSE)。  
-**非商业用途免费授权；未经原作者授权严禁用于任何商业贩售与盈利行为。**
+**非商业用途免费授权；商用请联系 [dmin@myhomeyin.help](mailto:admin@myhomeyin.help) 获取商业授权许可。**
